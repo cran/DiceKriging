@@ -1,0 +1,286 @@
+\name{km}
+\alias{km}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{ Fit and/or create kriging models }
+\description{
+  \code{km} is used to fit kriging models when parameters are unknown, or to create \code{km} objects otherwise. In both cases, the result is a \code{km} object. If parameters are unknown, they are estimated by Maximum Likelihood. As a beta version, Penalized Maximum Likelihood Estimation is also possible if some penalty is given.
+}
+
+\usage{
+km(formula, design, response, covtype,
+   coef.trend = NULL, coef.cov = NULL, coef.var = NULL,
+   nugget = NULL, nugget.estim=FALSE, noise.var=NULL, penalty = NULL, 
+   optim.method = "BFGS", lower = NULL, upper = NULL, parinit = NULL, 
+   control = NULL, gr = TRUE)
+}
+
+
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{formula}{ an object of class "formula" specifying the linear trend of the kriging model (see \code{\link{lm}}). This formula should concern only the input variables, and not the output (response). If there is any, it is automatically dropped. In particular, no response transformation is available yet.}
+  \item{design}{ a data frame representing the design of experiments. The ith row contains the values of the d input variables corresponding to the ith evaluation}
+  \item{response}{ a vector (or 1-column matrix or data frame) containing the values of the 1-dimensional output given by the objective function at the \code{design} points. }
+  \item{covtype}{ a character string specifying the covariance structure to be used, to be chosen between \code{"gauss"}, \code{"matern5_2"}, \code{"matern3_2"}, \code{"exp"} or \code{"powexp"}. See a full description of available covariance kernels in \code{\link{covTensorProduct-class}} }
+  \item{coef.trend,}{ (see below)}
+  \item{coef.cov,}{ (see below)}
+  \item{coef.var}{ optional vectors containing the values for the trend, covariance and variance parameters. For estimation, there are 3 cases: if \code{coef.trend}, \code{coef.cov}, \code{coef.var} are provided, no estimation is performed; if \code{coef.trend} is provided but at least one of \code{coef.cov} or \code{coef.var} is missing, both \code{coef.cov} and \code{coef.var} are estimated; if all are missing, all are estimated.}
+   \item{nugget}{ an optional variance value standing for the homogeneous nugget effect.}
+  \item{nugget.estim}{ an optional boolean indicating whether the nugget effect should be estimated. Note that this option does not concern the case of heterogeneous noisy observations (see \code{noise.var} below). If \code{nugget} is given, it is used as an initial value. Default is \code{FALSE}.}
+  \item{noise.var}{ for noisy observations : an optional vector containing the noise variance at each observation. This is useful for stochastic simulators. Default is \code{NULL}.}
+  \item{penalty}{ (beta version) an optional list suitable for Penalized Maximum Likelihood Estimation. The list must contain the item \code{fun} indicating the penalty function, and the item \code{value} equal to the value of the penalty parameter. At this stage the only available \code{fun} is \code{"SCAD"}, and \code{covtype} must be \code{"gauss"}. Default is \code{NULL}, corresponding to (un-penalized) Maximum Likelihood Estimation.}
+  \item{optim.method}{ an optional character string indicating which optimization method is chosen for the likelihood maximization. \code{"BFGS"} is the \code{optim} quasi-Newton procedure of package \code{stats}, with the method "L-BFGS-B". \code{"gen"} is the \code{genoud} genetic algorithm (using derivatives) from package \code{rgenoud} (>= 5.3.3). }
+ \item{lower, }{ (see below) }
+  \item{upper}{ optional vectors containing the bounds of the correlation parameters for optimization. The default values are given by \code{\link{covParametersBounds}}. }
+   \item{parinit}{ an optional vector containing the initial values for the variables to be optimized over. If no vector is given, an initial point is generated as follows. For method \code{"gen"}, the initial point is generated uniformly inside the hyper-rectangle domain defined by \code{lower} and \code{upper}. For method \code{"BFGS"}, some points (see \code{control} below) are generated uniformly in the domain. Then the best point with respect to the likelihood (or penalized likelihood, see \code{penalty}) criterion is chosen. }
+   \item{control}{ an optional list of control parameters for optimization. To avoid printing information in the command line during optimization progress, indicate \code{trace=FALSE}. For method \code{"BFGS"}, \code{pop.size} is the number of candidate initial points generated before optimization starts (see \code{parinit} above). Default is 20. For method \code{"gen"}, one can control  \code{"pop.size"}  (default : min(20, 4+3*log(nb of variables) ),  \code{"max.generations"} (5),  \code{"wait.generations"} (2) and  \code{"BFGSburnin"} (0) of function  \code{"genoud"} (see \code{\link[rgenoud]{genoud}}). Numbers into brackets are the default values. }
+   \item{gr}{ an optional boolean indicating whether the analytical gradient should be used. Default is \code{TRUE}.}
+}
+
+\value{
+  An object of class \code{km} (see \code{\link{km-class}}).
+}
+
+\references{ 
+
+N.A.C. Cressie (1993), \emph{Statistics for spatial data}, Wiley series in probability and mathematical statistics.
+
+D. Ginsbourger (2009), \emph{Multiples metamodeles pour l'approximation et l'optimisation
+de fonctions numeriques multivariables}, Ph.D. thesis, Ecole Nationale Superieure des
+Mines de Saint-Etienne, 2009.
+
+D. Ginsbourger, D. Dupuy, A. Badea, O. Roustant, and L. Carraro (2009), A note on the choice and the estimation of kriging models for the analysis of deterministic computer experiments, \emph{Applied Stochastic Models for Business and Industry}, \bold{25} no. 2, 115-131.
+
+A.G. Journel and M.E. Rossi (1989), When do we need a trend model in kriging ?, \emph{Mathematical Geology}, \bold{21} no. 7, 715-739.
+
+D.G. Krige (1951), A statistical approach to some basic mine valuation problems on the witwatersrand, \emph{J. of the Chem., Metal. and Mining Soc. of South Africa}, \bold{52} no. 6, 119-139.
+
+R. Li and A. Sudjianto (2005), Analysis of Computer Experiments Using Penalized Likelihood in Gaussian Kriging Models, \emph{Technometrics}, \bold{47} no. 2, 111-120.
+
+K.V. Mardia and R.J. Marshall (1984), Maximum likelihood estimation of models for residual covariance in spatial regression, \emph{Biometrika}, \bold{71}, 135-146.
+
+J.D. Martin and T.W. Simpson (2005), Use of kriging models to approximate deterministic computer models, \emph{AIAA Journal}, \bold{43} no. 4, 853-863.
+
+G. Matheron (1969), Le krigeage universel, \emph{Les Cahiers du Centre de Morphologie Mathematique de Fontainebleau}, \bold{1}.
+
+W.R. Jr. Mebane and J.S. Sekhon, in press (2009), Genetic optimization using derivatives: The rgenoud package for R, \emph{Journal of Statistical Software}.
+
+J.-S. Park and J. Baek (2001), Efficient computation of maximum likelihood estimators in a spatial linear model with power exponential covariogram, \emph{Computer Geosciences}, \bold{27} no. 1, 1-7.
+
+C.E. Rasmussen and C.K.I. Williams (2006), \emph{Gaussian Processes for Machine Learning}, the MIT Press, \url{http://www.GaussianProcess.org/gpml}
+
+}
+
+\author{ O. Roustant, D. Ginsbourger, Ecole des Mines de St-Etienne. }
+
+\seealso{ \code{\link{show.km}}, \code{\link{predict.km}}, \code{\link{plot.km}}. Some programming details and initialization choices can be found in \code{\link{kmNoNugget}}, \code{\link{kmNoNugget.init}}, \code{\link{km1Nugget}}, \code{\link{km1Nugget.init}}, \code{\link{kmNuggets}} and \code{\link{kmNuggets.init}} }
+
+\keyword{models}
+\keyword{htest}
+\examples{
+
+# ----------------------------------
+# A 2D example - Branin-Hoo function
+# ----------------------------------
+
+# a 16-points factorial design, and the corresponding response
+d <- 2; n <- 16
+design.fact <- expand.grid(seq(0,1,length=4), seq(0,1,length=4))
+design.fact <- data.frame(design.fact); names(design.fact)<-c("x1", "x2")
+response.branin <- data.frame(branin(design.fact)); names(response.branin) <- "y" 
+
+# kriging model 1 : gaussian covariance structure, no trend, no nugget effect
+m1 <- km(~1, design=design.fact, response=response.branin, covtype="gauss")
+
+# kriging model 2 : gaussian covariance structure, 
+#                   linear trend + interactions, no nugget effect
+m2 <- km(~., design=design.fact, response=response.branin, covtype="gauss")
+
+# graphics 
+n.grid <- 50
+x.grid <- y.grid <- seq(0,1,length=n.grid)
+design.grid <- expand.grid(x.grid, y.grid)
+response.grid <- apply(design.grid, 1, branin)
+predicted.values.model1 <- predict(m1, design.grid, "UK")$mean
+predicted.values.model2 <- predict(m2, design.grid, "UK")$mean
+par(mfrow=c(3,1))
+contour(x.grid, y.grid, matrix(response.grid, n.grid, n.grid), 50, main="Branin")
+points(design.fact[,1], design.fact[,2], pch=17, cex=1.5, col="blue")
+contour(x.grid, y.grid, matrix(predicted.values.model1, n.grid, n.grid), 50, 
+        main="Ordinary Kriging")
+points(design.fact[,1], design.fact[,2], pch=17, cex=1.5, col="blue")
+contour(x.grid, y.grid, matrix(predicted.values.model2, n.grid, n.grid), 50, 
+        main="Universal Kriging")
+points(design.fact[,1], design.fact[,2], pch=17, cex=1.5, col="blue")
+par(mfrow=c(1,1))
+
+
+# -------------------------------
+# A 1D example with penalized MLE
+# -------------------------------
+
+# from Fang K.-T., Li R. and Sudjianto A. (2006), "Design and Modeling for 
+# Computer Experiments", Chapman & Hall, pages 145-152
+
+n <- 6; d <- 1
+x <- seq(from=0, to=10, length=n)
+y <- sin(x)
+x.pred <- seq(0,10, length=100)
+
+# one should add a small nugget effect, to avoid numerical problems
+epsilon <- 1e-3
+model <- km(formula<- ~1, design=data.frame(X=x), response=data.frame(y=y), 
+            covtype="gauss", penalty=list(fun="SCAD", value=3), nugget=epsilon)
+
+p <- predict(model, x.pred, "UK")
+
+plot(x.pred, p$mean, type="l", xlab="x", ylab="y", 
+                     main="Prediction via Penalized Kriging")
+points(x, y, col="red", pch=19)
+lines(x.pred, sin(x.pred), lty=2, col="blue")
+legend(0, -0.5, legend=c("Sine Curve", "Sample", "Fitted Curve"), 
+       pch=c(-1,19,-1), lty=c(2,-1,1), col=c("blue","red","black"))
+
+
+# ------------------------------------------------------------------------
+# A 1D example with known trend and known or unknown covariance parameters
+# ------------------------------------------------------------------------
+
+x <- c(0, 0.4, 0.6, 0.8, 1);
+y <- c(-0.3, 0, -0.8, 0.5, 0.9)
+
+theta <- 0.01; sigma <- 3; trend <- c(-1,2)
+
+model <- km(~x, design=data.frame(x=x), response=data.frame(y=y), 
+            covtype="matern5_2", coef.trend=trend, coef.cov=theta, 
+            coef.var=sigma^2)
+
+# below: if you want to specify trend only, and estimate both theta and sigma:
+# model <- km(~x, design=data.frame(x=x), response=data.frame(y=y), 
+#             covtype="matern5_2", coef.trend=trend, lower=0.2)
+# Remark: a lower bound or penalty function is useful here,
+#         due to the very small number of design points...
+
+# kriging with gaussian covariance C(x,y)=sigma^2 * exp(-[(x-y)/theta]^2), 
+#         and linear trend t(x) = -1 + 2x
+
+t <- seq(from=0, to=1, by=0.005)
+p <- predict(model, newdata=t, type="SK")
+# beware that type = "SK" for known parameters (default is "UK")
+
+plot(t, p$mean, type="l", ylim=c(-7,7), xlab="x", ylab="y")
+lines(t, p$lower95, col="black", lty=2)
+lines(t, p$upper95, col="black", lty=2)
+points(x, y, col="red", pch=19)
+abline(h=0)
+
+
+# --------------------------------------------------------------
+# Kriging with noisy observations (heterogeneous noise variance)
+# --------------------------------------------------------------
+
+fundet <- function(x){
+return((sin(10*x)/(1+x)+2*cos(5*x)*x^3+0.841)/1.6)
+}
+
+level <- 0.5; epsilon <- 0.1
+theta <- 1/sqrt(30); p <- 2; n <- 10
+x <- seq(0,1, length=n);
+
+# Heteregeneous noise variances: number of Monte Carlo evaluation among 
+#                                a total budget of 1000 stochastic simulations
+MC_numbers <- c(10,50,50,290,25,75,300,10,40,150)
+noise.var <- 3/MC_numbers
+
+# Making noisy observations from 'fundet' function (defined above)
+y <- fundet(x) + noise.var*rnorm(length(x))
+
+# kriging model definition (no estimation here)
+model <- km(y~1, design=data.frame(x=x), response=data.frame(y=y), 
+            covtype="gauss", coef.trend=0, coef.cov=theta, coef.var=1, 
+            noise.var=noise.var)
+
+# prediction
+t <- seq(0,1,by=0.01)
+p <- predict.km(model, newdata=t, type="SK")
+lower <- p$lower95; upper <- p$upper95
+
+# graphics
+par(mfrow=c(1,1))
+plot(t, p$mean, type="l", ylim=c(1.1*min(c(lower,y)) , 1.1*max(c(upper,y))), 
+                xlab="x", ylab="y",col="blue", lwd=1.5)
+polygon(c(t,rev(t)), c(lower, rev(upper)), col=gray(0.9), border = gray(0.9))
+lines(t, p$mean, type="l", ylim=c(min(lower) ,max(upper)), xlab="x", ylab="y",
+                 col="blue", lwd=1)
+lines(t, lower , col="blue", lty=4, lwd=1.7)
+lines(t, upper , col="blue", lty=4, lwd=1.7)
+lines(t,fundet(t),col="black",lwd=2)
+points(x, y, pch=8,col="blue")
+text(x, y, labels=MC_numbers, pos=3)
+
+
+# -----------------------------
+# Checking parameter estimation 
+# -----------------------------
+
+d <- 3     		# problem dimension
+n <- 40			# size of the experimental design
+design <- matrix(runif(n*d), n, d)
+
+covtype <- "gauss"		
+theta <- c(0.3, 0.5, 1)		# the parameters to be found by estimation
+sigma <- 2
+nugget <- NULL  # choose a numeric value if you want to estimate nugget 
+nugget.estim <- FALSE # choose TRUE if you want to estimate it
+
+n.simu <- 30		# number of simulations
+sigma2.estimate <- nugget.estimate <- mu.estimate <- matrix(0, n.simu, 1)
+coef.estimate <- matrix(0, n.simu, length(theta))
+
+model <- km(~1, design=data.frame(design), response=rep(0,n), covtype=covtype, 
+            coef.trend=0, coef.cov=theta, coef.var=sigma^2, nugget=nugget)
+y <- simulate(model, nsim=n.simu)
+
+for (i in 1:n.simu) {
+	# parameter estimation: tune the optimizer by changing optim.method, control
+	model.estimate <- km(~1, design=data.frame(design), response=data.frame(y=y[i,]), 
+	covtype=covtype, optim.method="BFGS", control=list(pop.size=50, trace=FALSE), 
+        nugget.estim=nugget.estim) 
+	
+	# store results
+	coef.estimate[i,] <- covparam2vect(model.estimate@covariance)
+	sigma2.estimate[i] <- model.estimate@covariance@sd2
+	mu.estimate[i] <- model.estimate@trend.coef
+	if (nugget.estim) nugget.estimate[i] <- model.estimate@covariance@nugget
+}
+
+# comparison true values / estimation
+cat("\nResults with ", n, "design points, 
+    obtained with ", n.simu, "simulations\n\n",
+    "Median of covar. coef. estimates: ", apply(coef.estimate, 2, median), "\n",
+    "Median of trend  coef. estimates: ", median(mu.estimate), "\n", 
+    "Mean of the var. coef. estimates: ", mean(sigma2.estimate))
+if (nugget.estim) cat("\nMean of the nugget effect estimates: ", 
+                      mean(nugget.estimate))
+
+# one figure for this specific example - to be adapted
+split.screen(c(2,1))        # split display into two screens
+split.screen(c(1,2), screen = 2) # now split the bottom half into 3
+
+screen(1)
+boxplot(coef.estimate[,1], coef.estimate[,2], coef.estimate[,3], 
+        names=c("theta1", "theta2", "theta3"))
+abline(h=theta, col="red")
+fig.title <- paste("Empirical law of the parameter estimates 
+                    (n=", n , ", n.simu=", n.simu, ")", sep="")
+title(fig.title)
+
+screen(3)
+boxplot(mu.estimate, xlab="mu")
+abline(h=0, col="red")
+
+screen(4)
+boxplot(sigma2.estimate, xlab="sigma2")
+abline(h=sigma^2, col="red")
+
+close.screen(all = TRUE)  
+}
