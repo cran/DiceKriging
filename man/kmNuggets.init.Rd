@@ -11,8 +11,8 @@ kmNuggets.init(model)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{model}{  an object of class \code{km}. }
- }
+  \item{model}{ an object of class \code{km}. }
+}
 
 \value{
   An object of class \code{km}.

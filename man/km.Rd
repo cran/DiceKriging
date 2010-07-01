@@ -7,7 +7,7 @@
 }
 
 \usage{
-km(formula, design, response, covtype,
+km(formula=~1, design, response, covtype="matern5_2",
    coef.trend = NULL, coef.cov = NULL, coef.var = NULL,
    nugget = NULL, nugget.estim=FALSE, noise.var=NULL, penalty = NULL, 
    optim.method = "BFGS", lower = NULL, upper = NULL, parinit = NULL, 
@@ -17,10 +17,10 @@ km(formula, design, response, covtype,
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{formula}{ an object of class "formula" specifying the linear trend of the kriging model (see \code{\link{lm}}). This formula should concern only the input variables, and not the output (response). If there is any, it is automatically dropped. In particular, no response transformation is available yet.}
+  \item{formula}{ an optional object of class "formula" specifying the linear trend of the kriging model (see \code{\link{lm}}). This formula should concern only the input variables, and not the output (response). If there is any, it is automatically dropped. In particular, no response transformation is available yet. The default is \code{~1}, which defines a constant trend.}
   \item{design}{ a data frame representing the design of experiments. The ith row contains the values of the d input variables corresponding to the ith evaluation}
   \item{response}{ a vector (or 1-column matrix or data frame) containing the values of the 1-dimensional output given by the objective function at the \code{design} points. }
-  \item{covtype}{ a character string specifying the covariance structure to be used, to be chosen between \code{"gauss"}, \code{"matern5_2"}, \code{"matern3_2"}, \code{"exp"} or \code{"powexp"}. See a full description of available covariance kernels in \code{\link{covTensorProduct-class}} }
+  \item{covtype}{ an optional character string specifying the covariance structure to be used, to be chosen between \code{"gauss"}, \code{"matern5_2"}, \code{"matern3_2"}, \code{"exp"} or \code{"powexp"}. See a full description of available covariance kernels in \code{\link{covTensorProduct-class}}. Default is \code{"matern5_2"}. }
   \item{coef.trend,}{ (see below)}
   \item{coef.cov,}{ (see below)}
   \item{coef.var}{ optional vectors containing the values for the trend, covariance and variance parameters. For estimation, there are 3 cases: if \code{coef.trend}, \code{coef.cov}, \code{coef.var} are provided, no estimation is performed; if \code{coef.trend} is provided but at least one of \code{coef.cov} or \code{coef.var} is missing, both \code{coef.cov} and \code{coef.var} are estimated; if all are missing, all are estimated.}
@@ -32,7 +32,7 @@ km(formula, design, response, covtype,
  \item{lower, }{ (see below) }
   \item{upper}{ optional vectors containing the bounds of the correlation parameters for optimization. The default values are given by \code{\link{covParametersBounds}}. }
    \item{parinit}{ an optional vector containing the initial values for the variables to be optimized over. If no vector is given, an initial point is generated as follows. For method \code{"gen"}, the initial point is generated uniformly inside the hyper-rectangle domain defined by \code{lower} and \code{upper}. For method \code{"BFGS"}, some points (see \code{control} below) are generated uniformly in the domain. Then the best point with respect to the likelihood (or penalized likelihood, see \code{penalty}) criterion is chosen. }
-   \item{control}{ an optional list of control parameters for optimization. To avoid printing information in the command line during optimization progress, indicate \code{trace=FALSE}. For method \code{"BFGS"}, \code{pop.size} is the number of candidate initial points generated before optimization starts (see \code{parinit} above). Default is 20. For method \code{"gen"}, one can control  \code{"pop.size"}  (default : min(20, 4+3*log(nb of variables) ),  \code{"max.generations"} (5),  \code{"wait.generations"} (2) and  \code{"BFGSburnin"} (0) of function  \code{"genoud"} (see \code{\link[rgenoud]{genoud}}). Numbers into brackets are the default values. }
+   \item{control}{ an optional list of control parameters for optimization. To avoid printing information in the command line during optimization progress, indicate \code{trace=FALSE}. For method \code{"BFGS"}, \code{pop.size} is the number of candidate initial points generated before optimization starts (see \code{parinit} above). Default is 20. For method \code{"gen"}, one can control  \code{"pop.size"}  (default : min(20, 4+3*log(nb of variables) ),  \code{"max.generations"} (5),  \code{"wait.generations"} (2) and  \code{"BFGSburnin"} (0) of function  \code{"genoud"} (see \code{\link[rgenoud]{genoud}}). Another tunable paramater is \code{upper.alpha} (1-1e-8) for nugget estimation (see \code{\link{km1Nugget}}). Numbers into brackets are the default values. }
    \item{gr}{ an optional boolean indicating whether the analytical gradient should be used. Default is \code{TRUE}.}
 }
 
@@ -86,14 +86,14 @@ C.E. Rasmussen and C.K.I. Williams (2006), \emph{Gaussian Processes for Machine 
 d <- 2; n <- 16
 design.fact <- expand.grid(seq(0,1,length=4), seq(0,1,length=4))
 design.fact <- data.frame(design.fact); names(design.fact)<-c("x1", "x2")
-response.branin <- data.frame(branin(design.fact)); names(response.branin) <- "y" 
+y <- branin(design.fact) 
 
-# kriging model 1 : gaussian covariance structure, no trend, no nugget effect
-m1 <- km(~1, design=design.fact, response=response.branin, covtype="gauss")
+# kriging model 1 : matern5_2 covariance structure, no trend, no nugget effect
+m1 <- km(design=design.fact, response=y)
 
-# kriging model 2 : gaussian covariance structure, 
+# kriging model 2 : matern5_2 covariance structure, 
 #                   linear trend + interactions, no nugget effect
-m2 <- km(~., design=design.fact, response=response.branin, covtype="gauss")
+m2 <- km(~.^2, design=design.fact, response=y)
 
 # graphics 
 n.grid <- 50
@@ -226,7 +226,7 @@ d <- 3     		# problem dimension
 n <- 40			# size of the experimental design
 design <- matrix(runif(n*d), n, d)
 
-covtype <- "gauss"		
+covtype <- "matern5_2"		
 theta <- c(0.3, 0.5, 1)		# the parameters to be found by estimation
 sigma <- 2
 nugget <- NULL  # choose a numeric value if you want to estimate nugget 

@@ -38,6 +38,7 @@ function(model, envir) {
 		cat("\n")
 		cat("  - parameters lower bounds : ", lower[1:(lp-1)], "\n")
  		cat("  - parameters upper bounds : ", upper[1:(lp-1)], "\n")
+		cat("  - upper bound for alpha   : ", model@upper[lp],"\n")
 		cat("  - best initial point among ", model@control$pop.size, " :\n")
  		cat("         coef.     : ", covparam2vect(model@covariance), "\n")
  		cat("         alpha.    : ", parinit[lp], "\n")

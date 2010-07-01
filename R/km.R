@@ -1,5 +1,5 @@
 `km` <-
-function(formula, design, response, covtype, coef.trend=NULL, coef.cov=NULL, coef.var=NULL, 
+function(formula=~1, design, response, covtype="matern5_2", coef.trend=NULL, coef.cov=NULL, coef.var=NULL, 
          nugget=NULL, nugget.estim=FALSE, noise.var=NULL, penalty=NULL, 
          optim.method="BFGS", lower=NULL, upper=NULL, parinit=NULL, control=NULL, gr=TRUE) {
 	
@@ -96,6 +96,13 @@ function(formula, design, response, covtype, coef.trend=NULL, coef.cov=NULL, coe
 		else control$trace <- 2
 	}
 	
+	upper.alpha <- control$upper.alpha
+	if (length(upper.alpha)==0) {
+		control$upper.alpha <- 1 - 1e-8
+	} else if ((upper.alpha<0) | (upper.alpha>1)) {
+		control$upper.alpha <- 1 - 1e-8
+	}
+			 
 	model@control <- control
 
 	model@gr <- as.logical(gr)

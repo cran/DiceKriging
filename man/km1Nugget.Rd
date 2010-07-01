@@ -17,6 +17,7 @@ km1Nugget(model, envir)
 
 \note{
 	When a nugget effect is to be estimated, optimization if performed with respect to the correlation parameters and \code{alpha = sigma^2/(sigma^2 +  delta^2)}, with \code{sigma^2} the variance of unnoisy part, and \code{delta^2} the noise variance. Thus, \code{alpha} is the proportion of variance explained by the unnoisy part of the process. It can easily be shown that all other parameters ML estimators are function of the correlation parameters and \code{alpha} estimators.
+	The upper bound for alpha is fixed to 1 - 1e-8, to avoid numerical instabilities (a value of alpha close to 1 is equivalent to a numerical nugget close to 0). The user can change this value by modifying \code{upper.alpha} of parameter \code{control} in \code{km}: \code{control = list(upper.alpha = USER VALUE)} (with \code{0 < USER VALUE <= 1}).
 	}
 
 \value{

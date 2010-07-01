@@ -90,7 +90,7 @@ function(model) {
 	#model@covariance@nugget <- nugget.init
 	
   	model@lower <- c(lower, 0)	              
-	model@upper <- c(upper, 1)
+	model@upper <- c(upper, model@control$upper.alpha)
 	
 	return(model)
 }

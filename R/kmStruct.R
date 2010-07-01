@@ -159,7 +159,7 @@ predict.km <- function(object, newdata, type, se.compute=TRUE, cov.compute=FALSE
 	F.newdata <- model.matrix(object@trend.formula, data=data.frame(newdata))
 	y.predict.trend <- F.newdata%*%beta
 	
-	c.newdata <- covMat1Mat2(X, newdata, object@covariance, nugget.flag=FALSE)    # compute c(x) for x = newdata ; remark that for prediction (or filtering), cov(Yi, Yj)=0  even if Yi and Yj are the outputs related to the equal points xi and xj.
+	c.newdata <- covMat1Mat2(X, newdata, object@covariance, nugget.flag=object@covariance@nugget.flag)    # compute c(x) for x = newdata ; remark that for prediction (or filtering), cov(Yi, Yj)=0  even if Yi and Yj are the outputs related to the equal points xi and xj.
 	
 	Tinv.c.newdata <- backsolve(t(T), c.newdata, upper.tri=FALSE)
 	y.predict.complement <- t(Tinv.c.newdata)%*%z
@@ -212,9 +212,9 @@ predict.km <- function(object, newdata, type, se.compute=TRUE, cov.compute=FALSE
 	
 	if (cov.compute==TRUE) {		
 			
-		#if (object@covariance@nugget.flag) {
-		#	total.sd2 <- object@covariance@sd2 + object@covariance@nugget
-		#} else total.sd2 <- object@covariance@sd2
+		if (object@covariance@nugget.flag) {
+			total.sd2 <- object@covariance@sd2 + object@covariance@nugget
+		} else total.sd2 <- object@covariance@sd2
 		
 		C.newdata <- covMatrix(newdata, object@covariance)[[1]]
 		cond.cov <- C.newdata - crossprod(Tinv.c.newdata)

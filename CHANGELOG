@@ -1,0 +1,4 @@
+## change / DiceKriging 1.0
+
+1. Addition of default values in km : "matern5_2" for argument covtype, constant trend for argument formula.2. Addition of an upper bound for alpha in the nugget effect estimation, to avoid matrix inversion problems. The upper bound can be tuned (or removed) by the user.
+
