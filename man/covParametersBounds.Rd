@@ -6,12 +6,12 @@
 \description{
   Default boundaries for covariance parameters. }
 \usage{
-covParametersBounds(X, covStruct)
+covParametersBounds(object, X)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{X}{ a matrix representing the design of experiments.}
-  \item{covStruct}{ an object of class \code{\link{covTensorProduct-class}}. }
+  \item{object}{an object specifying the covariance structure.}
+  \item{X}{a matrix representing the design of experiments.}
 }
 
 \value{

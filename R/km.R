@@ -1,7 +1,8 @@
 `km` <-
-function(formula=~1, design, response, covtype="matern5_2", coef.trend=NULL, coef.cov=NULL, coef.var=NULL, 
+function(formula=~1, design, response, covtype="matern5_2",  
+			 coef.trend=NULL, coef.cov=NULL, coef.var=NULL,
          nugget=NULL, nugget.estim=FALSE, noise.var=NULL, penalty=NULL, 
-         optim.method="BFGS", lower=NULL, upper=NULL, parinit=NULL, control=NULL, gr=TRUE) {
+         optim.method="BFGS", lower=NULL, upper=NULL, parinit=NULL, control=NULL, gr=TRUE, iso=FALSE, scaling=FALSE) {
 	
 	model <- new("km")
 	
@@ -22,31 +23,31 @@ function(formula=~1, design, response, covtype="matern5_2", coef.trend=NULL, coe
 	model@n <- nrow(X)
 	model@F <- F
 	model@p <- ncol(F)
-	
-	model@covariance <- covStruct.create(covtype=covtype, d=model@d, nugget=nugget)
-	model@covariance@var.names <- colnames(X)
-	model@covariance@nugget.flag <- ((length(nugget)!=0) | nugget.estim)
-	model@covariance@nugget.estim <- nugget.estim
-	
 	model@noise.flag <- (length(noise.var)!=0)
 	model@noise.var <- as.numeric(noise.var)
 
-	
-	if ((length(coef.trend)!=0) & (length(coef.cov)!=0) & (length(coef.var)!=0)) {
-		model@trend.coef <- as.numeric(coef.trend)
-		model@covariance <- vect2covparam(coef.cov, model@covariance)
-		model@covariance@sd2 <- as.numeric(coef.var)
-		model@covariance@nugget.estim <- FALSE
-		model@param.estim <- FALSE
-		model@known.param <- "All"
-		model@covariance@known.covparam <- "All"
-		validObject(model, complete=TRUE)
-		model <- computeAuxVariables(model)
-		return(model)
+	known.param <- ((length(coef.trend)!=0) & (length(coef.cov)!=0) & (length(coef.var)!=0))
+	if (known.param) {
+		nugget.estim <- FALSE
+		known.covparam <- "All"
+	} else {
+		coef.var <- coef.cov <- NULL
+		known.covparam <- "None"
 	}
 	
+	model@covariance <- covStruct.create(covtype=covtype, d=model@d, known.covparam=known.covparam, coef.cov=coef.cov, coef.var=coef.var, nugget=nugget, nugget.estim=nugget.estim, nugget.flag=((length(nugget)!=0) | nugget.estim),  iso=iso, scaling=scaling, var.names=colnames(X))
+
 	# Now, at least some parameters are unknown
-	model@covariance@known.covparam <- "None"   # nugget parameter is excluded here 
+	
+	if (known.param) {
+		model@trend.coef <- as.numeric(coef.trend)
+		model@param.estim <- FALSE
+		model@known.param <- "All"	
+#		validObject(model, complete=TRUE)
+		model <- computeAuxVariables(model)
+		return(model)
+	}		
+	 
 	if ((length(coef.trend)!=0) & (length(coef.cov)==0) & (length(coef.var)==0)) {
 		model@trend.coef <- as.numeric(coef.trend)
 		model@known.param <- "Trend"
@@ -70,7 +71,7 @@ function(formula=~1, design, response, covtype="matern5_2", coef.trend=NULL, coe
 	model@optim.method <- as.character(optim.method)
 	
 	if ((length(lower)==0) | (length(upper)==0)) {
-		bounds <- covParametersBounds(design, model@covariance)
+		bounds <- covParametersBounds(model@covariance, design)
 		if (length(lower)==0) lower <- bounds$lower
 		if (length(upper)==0) upper <- bounds$upper
 	}

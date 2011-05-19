@@ -165,8 +165,8 @@ sigma2 <- 1
 
 for (i in 1:length(covtype)) {
 	covStruct <- covStruct.create(covtype=covtype[i], d=d, 
-                                      coef.cov=param, coef.var=sigma2)
-	y <- covMat1Mat2(as.matrix(x), as.matrix(0), covStruct)
+                 coef.cov=param, coef.var=sigma2, known.covparam="All")
+	y <- covMat1Mat2(covStruct, X1=as.matrix(x), X2=as.matrix(0))
 	lines(x, y, col=i, lty=i)
 	}
 legend(x=1.3, y=1, legend=covtype, col=1:length(covtype), 
@@ -200,8 +200,8 @@ sigma2 <- 1
 
 for (i in 1:length(param)) {
 	covStruct <- covStruct.create(covtype=covtype, d=d, 
-                     coef.cov=c(1, param[i]), coef.var=sigma2)
-	y <- covMat1Mat2(as.matrix(x), as.matrix(0), covStruct)
+                     coef.cov=c(1, param[i]), coef.var=sigma2, known.covparam="All")
+	y <- covMat1Mat2(covStruct, X1=as.matrix(x), X2=as.matrix(0))
 	lines(x, y, col=i, lty=i)
 	}
 legend(x=1.4, y=1, legend=paste("p=", param), col=1:3, lty=1:3)

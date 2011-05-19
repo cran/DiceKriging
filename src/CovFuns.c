@@ -212,6 +212,110 @@ void C_covMatrixDerivative(const double *X, const int *n, const int *d, const do
 
 
 /* ------------------------------------------------------- */
+/* covariance matrix derivatives with respect to one point */
+/* ------------------------------------------------------- */
+
+double C_covGaussDerivative_dx(const double *X, const int *n, const int *d, const int *i, const int *j, const double *param, const double *scaling_factor, const int *k, const double *C) {
+  	/* derive C(X_i, X_j) with respect to h_k */
+	double dlnC = 0.;
+	double v = param[*k] / *scaling_factor;
+	dlnC = -2*(X[*j + *n * *k] - X[*i + *n * *k]) / SQUARE(v);
+	return(dlnC * C[*i + *n * *j]);
+}
+
+double C_covExpDerivative_dx(const double *X, const int *n, const int *d, const int *i, const int *j, const double *param, const double *scaling_factor, const int *k, const double *C) {
+  	/* derive C(X_i, X_j) with respect to h_k */
+	double ecart = X[*j + *n * *k] - X[*i + *n * *k];
+	double sign_ecart = 1.;
+	double dlnC = 0.;
+	
+	if (ecart == 0.)
+      	return(0.);
+	else if (ecart < 0) 
+  		sign_ecart = -1.;
+	
+	dlnC = - sign_ecart / param[*k];
+	return(dlnC * C[*i + *n * *j]);
+}
+	
+double C_covMatern3_2Derivative_dx(const double *X, const int *n, const int *d, const int *i, const int *j, const double *param, const double *scaling_factor, const int *k, const double *C) {
+  	/* derive C(X_i, X_j) with respect to h_k */
+	double ecart = X[*j + *n * *k] - X[*i + *n * *k];
+	double sign_ecart = 1.;
+	double dlnC = 0.;
+	
+	if (ecart == 0.)
+      	return(0.);
+	else if (ecart < 0) 
+  		sign_ecart = -1.;
+	
+	ecart = fabs(ecart) / (param[*k] / *scaling_factor);
+	dlnC = - sign_ecart * ecart / (1+ecart) / (param[*k] / *scaling_factor);
+	return(dlnC * C[*i + *n * *j]);
+}
+
+double C_covMatern5_2Derivative_dx(const double *X, const int *n, const int *d, const int *i, const int *j, const double *param, const double *scaling_factor, const int *k, const double *C) {
+  	/* derive C(X_i, X_j) with respect to h_k */	
+	double ecart = X[*j + *n * *k] - X[*i + *n * *k];
+	double sign_ecart = 1.;
+	double dlnC = 0.;
+	
+	if (ecart == 0.)
+      	return(0.);
+	else if (ecart < 0) 
+  		sign_ecart = -1.;
+	
+	ecart = fabs(ecart) / (param[*k] / *scaling_factor);
+	double u = 1 + ecart;
+	double v = ecart/3;
+	dlnC = - sign_ecart * u*v / (u+ecart*v) / (param[*k] / *scaling_factor);
+	return(dlnC * C[*i + *n * *j]);		
+}
+
+double C_covPowExpDerivative_dx(const double *X, const int *n, const int *d, const int *i, const int *j, const double *param, const double *scaling_factor, const int *k, const double *C) {
+  	/* derive C(X_i, X_j) with respect to h_k */
+	double ecart = X[*j + *n * *k] - X[*i + *n * *k];
+	double sign_ecart = 1.;
+	double dlnC = 0.;
+	
+	if (ecart == 0.)
+      	return(0.);
+	else if (ecart < 0) 
+  		sign_ecart = -1.;
+	
+	ecart = fabs(ecart) / param[*k];
+	dlnC = - sign_ecart * pow(ecart, param[*k + *d] - 1) * param[*k + *d] / param[*k];
+	return(dlnC * C[*i + *n * *j]);			
+}
+
+
+void C_covMatrixDerivative_dx(const double *X, const int *n, const int *d, const double *param, const char **type, int *k, double *C, double *ans) {
+	
+	(*k)--;  /* since the first element of an array is 0 in C language*/
+	
+	double (*C_covFunctionDerivative_dx)(const double *, const int *, const int *, const int *, const int *, const double *, const double *, const int *, const double *);
+	
+	double scf = C_covScalingFactor(*type);   /* scaling factor */ 
+	
+	if (strcmp(*type, "gauss") == 0)  C_covFunctionDerivative_dx = C_covGaussDerivative_dx;
+	else if (strcmp(*type, "exp") == 0) C_covFunctionDerivative_dx = C_covExpDerivative_dx;
+	else if (strcmp(*type, "matern3_2") == 0) C_covFunctionDerivative_dx = C_covMatern3_2Derivative_dx;
+	else if (strcmp(*type, "matern5_2") == 0) C_covFunctionDerivative_dx = C_covMatern5_2Derivative_dx;
+	else if (strcmp(*type, "powexp") == 0) C_covFunctionDerivative_dx = C_covPowExpDerivative_dx; 
+	
+	for (int i = 0; i < *n; i++) {
+		for (int j = 0; j < i; j++) {
+			ans[j + *n * i] = (*C_covFunctionDerivative_dx)(X, n, d, &i, &j, param, &scf, k, C);
+			ans[i + *n * j] = - ans[j + *n * i];
+		}
+		ans[i + *n * i] = 0;
+	}
+	
+}
+
+
+
+/* ------------------------------------------------------- */
 /* covariance vector derivatives with respect to one point */
 /* ------------------------------------------------------- */
 

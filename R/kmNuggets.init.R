@@ -53,7 +53,12 @@ function(model) {
 	if (identical(parinit, numeric(0))) {
 			# sample ninit design points, generated from uniform [lower, upper]
 		matrixinit <- matrix(runif(ninit*param.n), param.n, ninit)
-		matrixinit <- lower + matrixinit*(upper - lower) 
+    if (!is(model@covariance, "covAffineScaling")) {
+  	  matrixinit <- lower + matrixinit*(upper - lower)
+    } else {
+      matrixinit <- 1/upper + matrixinit*(1/lower - 1/upper)
+      matrixinit <- 1/matrixinit
+    }    
 	} else matrixinit <- matrix(parinit, param.n, ninit) 
 			
 	varinit.sim <- runif(n=ninit, min=1/2*varinit, max=3/2*varinit)       

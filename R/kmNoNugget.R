@@ -30,9 +30,12 @@ function(model, envir) {
 		if (is.null(gr)) {
 			cat(" not used\n")}
 		else cat(" used\n")
-		cat("* trend model : "); print(model@trend.formula)
+		cat("* trend model : "); print(model@trend.formula, showEnv=FALSE)
 		cat("* covariance model : \n")
-		cat("  - type : ",  model@covariance@name, "\n")
+		cat("  - type : ",  model@covariance@name)
+    if (is(model@covariance, "covIso")) cat(", isotropic")
+    if (is(model@covariance, "covAffineScaling")) cat(", with affine scaling")
+    cat("\n") 
 		cat("  - nugget : NO\n")
 		cat("  - parameters lower bounds : ", lower, "\n")
  		cat("  - parameters upper bounds : ", upper, "\n")
@@ -90,8 +93,8 @@ function(model, envir) {
 	model@T <- T*sigma.hat
 	model@z <- as.numeric(z/sigma.hat)
 	model@M <- M/sigma.hat
-	
 	model@covariance@sd2 <- as.numeric(sigma2.hat)
+		
 	model@covariance <- vect2covparam(o$par, model@covariance)
 	
 	return(model) 

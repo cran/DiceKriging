@@ -3,12 +3,30 @@
 \alias{covTensorProduct-class}
 \alias{show,covTensorProduct-method}
 \alias{coef,covTensorProduct-method}
+\alias{coefficients,covTensorProduct-method}
+\alias{covMat1Mat2,covTensorProduct-method}
+\alias{covMatrix,covTensorProduct-method}
+\alias{covMatrixDerivative,covTensorProduct-method}
+\alias{covParametersBounds,covTensorProduct-method}
+\alias{covVector.dx,covTensorProduct-method}
+\alias{inputnames,covTensorProduct-method}
+%\alias{inputnames<-,covTensorProduct,character-method}
+\alias{kernelname,covTensorProduct-method}
+\alias{ninput,covTensorProduct-method}
+\alias{nuggetflag,covTensorProduct-method}
+\alias{nuggetvalue,covTensorProduct-method}
+\alias{nuggetvalue<-,covTensorProduct,numeric-method}
+\alias{slice,covTensorProduct-method}
+\alias{slice,covTensorProduct,numeric-method}
+\alias{summary,covTensorProduct-method}
+
+
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 
-\title{ Tensor product (or separable) spatial covariances class }
+\title{ Class of tensor-product spatial covariances }
 \description{
-  S4 class of tensor product covariances.}
+  S4 class of tensor-product (or separable) covariances.}
 
 \value{
 \item{covTensorProduct}{separable covariances depending on 1 set of parameters, such as Gaussian, exponential, Matern with fixed nu... or on 2 sets of parameters, such as power-exponential.}

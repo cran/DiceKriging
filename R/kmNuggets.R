@@ -31,9 +31,12 @@ function(model, envir) {
 		if (is.null(gr)) {
 			cat(" not used\n")}
 		else cat(" used\n")
-		cat("* trend model : "); print(model@trend.formula)
+		cat("* trend model : "); print(model@trend.formula, showEnv=FALSE)
 		cat("* covariance model : \n")
-		cat("  - type : ",  model@covariance@name, "\n")
+		cat("  - type : ",  model@covariance@name)
+    if (is(model@covariance, "covIso")) cat(", isotropic")
+    if (is(model@covariance, "covAffineScaling")) cat(", with affine scaling")
+    cat("\n")
 		cat("  - noise variances : ")
 		cat("\n")
 		print(nugget)

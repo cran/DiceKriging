@@ -1,5 +1,6 @@
 \name{covMatrix} 
 \alias{covMatrix}
+
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Covariance matrix}
 \description{
@@ -7,12 +8,12 @@
 }
 
 \usage{
-covMatrix(X, covStruct, noise.var = NULL)
+covMatrix(object, X, noise.var = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
+ \item{object}{an object specifying the covariance structure.}
  \item{X}{ a matrix whose columns represent locations. }
- \item{covStruct}{an object of class \code{\link{covTensorProduct-class}}, specifying the covariance structure.}
  \item{noise.var}{for noisy observations : an optional vector containing the noise variance at each observation}
 }
 

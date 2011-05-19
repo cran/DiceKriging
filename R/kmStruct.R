@@ -17,7 +17,7 @@ setClass("km",
 		trend.formula = "formula",		   ## trend form
 		trend.coef = "numeric",			   ## trend coefficients, size px1
 			## covariance
-		covariance = "covTensorProduct",  ## covariance structure (new S4 class, see covStruct.R)
+		covariance = "covKernel",  ## covariance structure (new S4 class, see covStruct.R)
 			## noisy observations
 		noise.flag = "logical",  	   	   ## Are observations noisy ? 
 		noise.var = "numeric",		      ## vector of length n
@@ -159,7 +159,7 @@ predict.km <- function(object, newdata, type, se.compute=TRUE, cov.compute=FALSE
 	F.newdata <- model.matrix(object@trend.formula, data=data.frame(newdata))
 	y.predict.trend <- F.newdata%*%beta
 	
-	c.newdata <- covMat1Mat2(X, newdata, object@covariance, nugget.flag=object@covariance@nugget.flag)    # compute c(x) for x = newdata ; remark that for prediction (or filtering), cov(Yi, Yj)=0  even if Yi and Yj are the outputs related to the equal points xi and xj.
+	c.newdata <- covMat1Mat2(object@covariance, X1=X, X2=newdata, nugget.flag=object@covariance@nugget.flag)    # compute c(x) for x = newdata ; remark that for prediction (or filtering), cov(Yi, Yj)=0  even if Yi and Yj are the outputs related to the equal points xi and xj.
 	
 	Tinv.c.newdata <- backsolve(t(T), c.newdata, upper.tri=FALSE)
 	y.predict.complement <- t(Tinv.c.newdata)%*%z
@@ -216,7 +216,7 @@ predict.km <- function(object, newdata, type, se.compute=TRUE, cov.compute=FALSE
 			total.sd2 <- object@covariance@sd2 + object@covariance@nugget
 		} else total.sd2 <- object@covariance@sd2
 		
-		C.newdata <- covMatrix(newdata, object@covariance)[[1]]
+		C.newdata <- covMatrix(object@covariance, newdata)[[1]]
 		cond.cov <- C.newdata - crossprod(Tinv.c.newdata)
 		
 		if (type=="UK") {	
@@ -278,7 +278,7 @@ simulate.km <- function(object, nsim=1, seed=NULL, newdata=NULL, cond=FALSE, nug
    				colnames(newdata) <- colnames(object@X)
   
 			F.newdata <- model.matrix(object@trend.formula, data = data.frame(newdata))
-			Sigma <- covMatrix(newdata, object@covariance)[[1]]
+			Sigma <- covMatrix(object@covariance, newdata)[[1]]
 			T.newdata <- chol(Sigma + diag(nugget.sim, m, m))
 		}
 	}
@@ -296,7 +296,7 @@ simulate.km <- function(object, nsim=1, seed=NULL, newdata=NULL, cond=FALSE, nug
 		if (object@noise.flag) {
 			stop("conditional simulations not available for heterogeneous observations")
 		} else {
-			Sigma21 <- covMat1Mat2(object@X, newdata, object@covariance, nugget.flag=FALSE)           # size n x m
+			Sigma21 <- covMat1Mat2(object@covariance, X1=object@X, X2=newdata, nugget.flag=FALSE)           # size n x m
 			Tinv.Sigma21 <- backsolve(t(object@T), Sigma21, upper.tri = FALSE)     # t(T22)^(-1) * Sigma21,  size  n x m
 			y.trend.cond <- y.trend + t(Tinv.Sigma21) %*% object@z                 # size m x 1
 			

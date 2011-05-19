@@ -1,17 +1,18 @@
 `logLikFun` <-
 function(param, model, envir=NULL) {
-	
+		
 	if (identical(model@case, "NoNugget")) {
 		
 		model@covariance <- vect2covparam(param, model@covariance)
 		model@covariance@sd2 <- 1		# to get the correlation matrix
 		
-		aux <- covMatrix(model@X, model@covariance) 
+		aux <- covMatrix(model@covariance, model@X)
+		 
 		R <- aux[[1]]
 		T <- chol(R)
-    
-   		x <- backsolve(t(T), model@y, upper.tri = FALSE)
-   		M <- backsolve(t(T), model@F, upper.tri = FALSE)
+		    
+   	x <- backsolve(t(T), model@y, upper.tri = FALSE)
+   	M <- backsolve(t(T), model@F, upper.tri = FALSE)
 		if (identical(model@known.param, "Trend")) {
    			z <- x - M %*% model@trend.coef
    		} else {
@@ -21,7 +22,6 @@ function(param, model, envir=NULL) {
    		}
 	
 		sigma2.hat <- t(z)%*%(z) / model@n
-	
 		logLik <- -0.5*(model@n * log(2*pi*sigma2.hat) + 2*sum(log(diag(T))) + model@n)
 		
 		if (!is.null(envir)) { 
@@ -38,7 +38,7 @@ function(param, model, envir=NULL) {
 		model@covariance <- vect2covparam(param[1:(nparam-1)], model@covariance)
 		model@covariance@sd2 <- param[nparam]
 		
-		aux <- covMatrix(model@X, model@covariance, noise.var=model@noise.var)
+		aux <- covMatrix(model@covariance, model@X, noise.var=model@noise.var)
 	
 		C <- aux[[1]]
 		C0 <- aux[[2]] 
@@ -71,7 +71,7 @@ function(param, model, envir=NULL) {
 		model@covariance@nugget <- 0
 		alpha <- param[nparam]
 		
-		aux <- covMatrix(model@X, model@covariance)
+		aux <- covMatrix(model@covariance, model@X)
 		R0 <- aux[[2]]
 		R <- alpha*R0 + (1-alpha)*diag(model@n)
 		#C0 <- aux[[2]] 
@@ -105,8 +105,7 @@ function(param, model, envir=NULL) {
 			penalty <- - model@n * sum(fun(1/model@covariance@range.val^2, model@penalty$value))
 			logLik <- logLik + penalty
 	}
-	
-	
+		
 	return(logLik)
 
 }

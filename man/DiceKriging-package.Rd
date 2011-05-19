@@ -12,15 +12,17 @@ Estimation, validation and prediction of kriging models.
 \tabular{ll}{
 Package: \tab DiceKriging\cr
 Type: \tab Package\cr
-Version: \tab 1.1\cr
-Date: \tab 2010-07-01\cr
+Version: \tab 1.2\cr
+Date: \tab 2011-05-19\cr
 License: \tab GPL-3 \cr
 }
 }
 
-\author{O. Roustant, D. Ginsbourger, Y. Deville.
+\author{Olivier Roustant, David Ginsbourger, Yves Deville.
 
-(maintainer: O. Roustant \email{roustant@emse.fr})
+Contributors: Yann Richet
+
+Maintainer: Olivier Roustant \email{roustant@emse.fr}
 
 }
 
@@ -65,10 +67,11 @@ M. Schonlau (1997), \emph{Computer experiments and global optimization}, Ph.D. t
 
 M.L. Stein (1999), \emph{Interpolation of spatial data, some theory for kriging}, Springer.
 
+Y. Xiong, W. Chen, D. Apley, and X. Ding (2007), \emph{Int. J. Numer. Meth. Engng}, A non-stationary covariance-based Kriging method for metamodelling in engineering design. 
 }
 
 \note{
-This work was conducted within the frame of the DICE (Deep Inside Computer Experiments) Consortium between ARMINES, Renault, EDF, IRSN, ONERA and TOTAL S.A. (http://www.dice-consortium.fr/).
+This work is a follow-up of DiceKriging 1.1., which was conducted within the frame of the DICE (Deep Inside Computer Experiments) Consortium between ARMINES, Renault, EDF, IRSN, ONERA and TOTAL S.A. (http://www.dice-consortium.fr/).
 
 The authors wish to thank Laurent Carraro, Delphine Dupuy and Celine Helbert for fruitful discussions about the structure of the code. They also thank Gregory Six and Gilles Pujol for their advices on practical implementation issues, as well as the DICE members for useful feedbacks.
 

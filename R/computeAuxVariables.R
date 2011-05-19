@@ -1,6 +1,6 @@
 computeAuxVariables <- function(model) {
 	  
-	aux <- covMatrix(X=model@X, covStruct=model@covariance, noise.var=model@noise.var)
+	aux <- covMatrix(model@covariance, X=model@X, noise.var=model@noise.var)
 	C <- aux[[1]]
 	#if (model@covariance@nugget.flag) {
 	#	model@C0 <- aux[[2]] 

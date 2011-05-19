@@ -4,25 +4,30 @@ importFrom("graphics", plot)
 #importFrom("methods", show)
 importFrom("stats", predict)
 importFrom("stats", coef)
+importFrom("stats", coefficients)
+#importFrom("stats", summary)
 importFrom("stats", simulate)
 
 
 ## S4
-exportClasses(covTensorProduct, km)
+exportClasses(covTensorProduct, covIso, covKernel, km, covAffineScaling)
 ## All methods, for own or "foreign" generics:
-exportMethods(show, coef, plot, predict, simulate)
+exportMethods(show, plot, predict, simulate, covMatrix, covMat1Mat2, 
+covMatrixDerivative, covVector.dx, covParametersBounds, coefficients, summary, inputnames, ninput, kernelname, nuggetvalue, "nuggetvalue<-", nuggetflag)
 
-export(branin, 
+export(#as, 
+       #as.covIso, extract.covIso,
+       branin, 
        camelback, 
        computeAuxVariables, 
-       covMat1Mat2, 
-       covMatrix, 
-       covMatrixDerivative,
+       #covMat1Mat2.covTensorProduct, 
+       #covMatrix.covTensorProduct,
+       #covMatrixDerivative.covTensorProduct,
+       #covMatrixDerivative.dx.covTensorProduct,
        covparam2vect,
        vect2covparam,
-       covParametersBounds,
        covStruct.create,
-       covVector.dx,
+       #covVector.dx.covTensorProduct,
        drop.response,
        goldsteinPrice, 
        hartman3, 
@@ -42,7 +47,9 @@ export(branin,
        predict.km, 
        SCAD.derivative, 
        SCAD, 
-       show.km, 
-       simulate.km,
+       scalingFun,
+       scalingFunGrad,
+       #show.km, 
+       #simulate.km,
        trendMatrix.update)
 

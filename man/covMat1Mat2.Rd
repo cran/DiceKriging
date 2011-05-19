@@ -6,13 +6,13 @@
   Computes the cross covariance matrix between two sets of locations for a spatial random process with a given covariance structure. Typically the two sets are a learning set and a test set.
 }
 \usage{
-covMat1Mat2(X1, X2, covStruct, nugget.flag=FALSE)
+covMat1Mat2(object, X1, X2, nugget.flag=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{X1}{ a matrix whose rows represent the locations of a first set (for instance a set of learning points). }
-  \item{X2}{ a matrix whose rows represent the locations of a second set (for instance a set of test points). }
-  \item{covStruct}{a list specifying the covariance structure. }
+  \item{object}{an object specifying the covariance structure.}
+  \item{X1}{ a matrix whose rows represent the locations of a first set (for instance a set of learning points).}
+  \item{X2}{ a matrix whose rows represent the locations of a second set (for instance a set of test points).}
   \item{nugget.flag}{an optional boolean. If \code{TRUE}, the covariance between 2 equal locations takes into account the nugget effect (if any). Locations are considered equal if their euclidian distance is inferior to \code{1e-15}. Default is \code{FALSE}.}
 }
 

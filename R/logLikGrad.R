@@ -21,7 +21,7 @@ function(param, model, envir) {
 		xx.upper <- xx[upper.tri(xx)]
 
 		for (k in 1:nparam) {
-			gradR.k <- covMatrixDerivative(model@X, model@covariance, R, k)
+			gradR.k <- covMatrixDerivative(model@covariance, X=model@X, C=R, k=k)
 			gradR.k.upper <- gradR.k[upper.tri(gradR.k)]
 		
 			terme1 <- sum(xx.upper*gradR.k.upper)   / sigma2.hat   
@@ -59,7 +59,7 @@ function(param, model, envir) {
 		# partial derivative with respect to parameters except sigma^2
 		for (k in 1:(nparam-1)) {
 			#gradC.k <- gradC[[k]]
-			gradC.k <- covMatrixDerivative(model@X, model@covariance, C, k)
+			gradC.k <- covMatrixDerivative(model@covariance, X=model@X, C=C, k=k)
 			gradC.k.upper <- gradC.k[upper.tri(gradC.k)]
 			term1 <- sum(xx.upper*gradC.k.upper) #/ sigma2
 				# economic computation of - t(x)%*%gradC.k%*%x / sigma2      
@@ -104,7 +104,7 @@ function(param, model, envir) {
 
 		# partial derivative with respect to parameters except sigma^2
 		for (k in 1:(nparam-1)) {
-			gradC.k <- covMatrixDerivative(model@X, model@covariance, R0, k)
+			gradC.k <- covMatrixDerivative(model@covariance, X=model@X, C=R0, k=k)
 			gradC.k <- alpha*gradC.k
 			gradC.k.upper <- gradC.k[upper.tri(gradC.k)]
 			term1 <- sum(xx.upper*gradC.k.upper) / v

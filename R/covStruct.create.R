@@ -1,42 +1,53 @@
 `covStruct.create` <- 
-function(covtype, d, coef.cov=NULL, coef.var=NULL, nugget=NULL) {
+function(covtype, d, known.covparam, coef.cov=NULL, coef.var=NULL, nugget=NULL, nugget.estim=FALSE, nugget.flag=FALSE, iso=FALSE, scaling=FALSE, var.names=NULL) {
 	
+  if (scaling & iso) {
+    iso <- FALSE
+    warning("At this stage no isotropic version is available, regular scaling is applied.")
+  }
+  
 	covsetI <- c("gauss", "exp", "matern3_2", "matern5_2")
 	covsetII <- c("powexp")
-	if (identical(covtype, "powexp")) {
-		shape.names <- "p"
-	} else shape.names <- character(0)
-	
-	if (is.element(covtype, covsetI)) {
 
-		covStruct <- new("covTensorProduct", d = as.integer(d), name=as.character(covtype),
-									  paramset.n   = as.integer(1),
-		                        param.n      = as.integer(d),
-		                        sd2          = as.double(coef.var),
-		                        nugget.flag  = !is.null(nugget),
-		                        nugget.estim = FALSE,
-		                        nugget	      = as.double(nugget), 
-		                        range.n      = as.integer(d),
-		                        range.names  = "theta") 
+	classeType <- "covTensorProduct"
+	if (iso) classeType <- "covIso"
+	if (scaling) classeType <- "covAffineScaling"
+			 
+	covStruct <- new(classeType, d=as.integer(d), name=as.character(covtype), 
+		sd2 = as.numeric(coef.var), var.names=as.character(var.names), 
+		nugget = as.double(nugget), nugget.flag=nugget.flag, nugget.estim=nugget.estim, known.covparam=known.covparam) 
+									
+	if (!scaling) {					
+		
+		covStruct@range.names  = "theta"
+		
+		if (is.element(covtype, covsetI)) {
+			covStruct@paramset.n <- as.integer(1)
+			if (iso) {
+				covStruct@param.n <- as.integer(1)
+			} else {
+				covStruct@param.n <- as.integer(d)
+				covStruct@range.n <- as.integer(d)
+			}	
+		} else {	
+			covStruct@paramset.n <- as.integer(2)
+			covStruct@param.n <- as.integer(2*d)
+			covStruct@range.n <- as.integer(d)
+			covStruct@shape.n <- as.integer(d)
+			covStruct@shape.names <- "p"
+		}
 
-	} else {	
+		if (length(coef.cov)>0) covStruct <- vect2covparam(coef.cov, covStruct)
 
-		covStruct <- new("covTensorProduct", d = as.integer(d), name=as.character(covtype),
-										paramset.n   = as.integer(2),
-										param.n      = as.integer(2*d),
-										sd2          = as.double(coef.var),
-  		                         nugget.flag  = !is.null(nugget),
-  		                         nugget.estim = FALSE,
-		                         nugget       = as.double(nugget), 
-										range.n      = as.integer(d),
-										range.names  = "theta",
-		                        	shape.n      = as.integer(d),
-		                        	shape.names  = shape.names)
-   	}
-	
-	covStruct <- vect2covparam(coef.cov, covStruct)
-	
-	return(covStruct)
-	
+	} else {
+   	   	
+		covStruct@paramset.n <- as.integer(1)
+		covStruct@param.n <- as.integer(2*d)
+		covStruct@knots <- c(0,1)
+		if (!is.null(coef.cov)) covStruct@eta <- coef.cov
+    
+	}
+			 	
+	return(covStruct)	
 }
 

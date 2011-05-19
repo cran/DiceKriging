@@ -7,15 +7,16 @@
 }
 
 \usage{
-covMatrixDerivative(X, covStruct, C, k)
+covMatrixDerivative(object, X, C, k, ...)
 }
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{X}{ a matrix whose columns represent locations. }
-  \item{covStruct}{an object of class \code{\link{covTensorProduct-class}}, specifying the covariance structure. }
-  \item{C}{ a matrix corresponding to the covariance matrix for the locations specified in the X argument, when there is no nugget effet nor observation noise. }
-  \item{k}{ an integer representing the partial derivative index. }
+  \item{object}{an object specifying the covariance structure. }
+  \item{X}{a matrix whose columns represent locations. }
+  \item{C}{a matrix corresponding to the covariance matrix for the locations specified in the X argument, when there is no nugget effet nor observation noise. }
+  \item{k}{an integer representing the partial derivative index. }
+  \item{\dots}{additional parameters, typically an environment used for storage (when the \code{object} type is \code{covAffineScaling})}
 }
 
 \value{
