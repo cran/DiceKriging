@@ -1,5 +1,5 @@
 `covStruct.create` <- 
-function(covtype, d, known.covparam, coef.cov=NULL, coef.var=NULL, nugget=NULL, nugget.estim=FALSE, nugget.flag=FALSE, iso=FALSE, scaling=FALSE, var.names=NULL) {
+function(covtype, d, known.covparam, var.names, coef.cov=NULL, coef.var=NULL, nugget=NULL, nugget.estim=FALSE, nugget.flag=FALSE, iso=FALSE, scaling=FALSE, knots=NULL) {
 	
   if (scaling & iso) {
     iso <- FALSE
@@ -9,14 +9,18 @@ function(covtype, d, known.covparam, coef.cov=NULL, coef.var=NULL, nugget=NULL, 
 	covsetI <- c("gauss", "exp", "matern3_2", "matern5_2")
 	covsetII <- c("powexp")
 
-	classeType <- "covTensorProduct"
-	if (iso) classeType <- "covIso"
-	if (scaling) classeType <- "covAffineScaling"
-			 
-	covStruct <- new(classeType, d=as.integer(d), name=as.character(covtype), 
+	classType <- "covTensorProduct"
+	if (iso) classType <- "covIso"
+	if (scaling) {
+    if (is.null(knots)) {
+      classType <- "covAffineScaling"
+    } else classType <- "covScaling"
+	}
+  
+	covStruct <- new(classType, d=as.integer(d), name=as.character(covtype), 
 		sd2 = as.numeric(coef.var), var.names=as.character(var.names), 
 		nugget = as.double(nugget), nugget.flag=nugget.flag, nugget.estim=nugget.estim, known.covparam=known.covparam) 
-									
+									                
 	if (!scaling) {					
 		
 		covStruct@range.names  = "theta"
@@ -39,15 +43,37 @@ function(covtype, d, known.covparam, coef.cov=NULL, coef.var=NULL, nugget=NULL, 
 
 		if (length(coef.cov)>0) covStruct <- vect2covparam(coef.cov, covStruct)
 
-	} else {
+	} else if (classType=="covAffineScaling") {
    	   	
 		covStruct@paramset.n <- as.integer(1)
 		covStruct@param.n <- as.integer(2*d)
 		covStruct@knots <- c(0,1)
-		if (!is.null(coef.cov)) covStruct@eta <- coef.cov
+		if (length(coef.cov)>0) covStruct@eta <- coef.cov
+    
+	} else {
+    
+    eta.flag <- (length(coef.cov)>0)
+		
+    for (i in 1:length(knots)) {
+      if (is.unsorted(knots[[i]])) {        
+        ordKnots <- sort(knots[[i]], index.return = TRUE)
+        knots[[i]] <- ordKnots$x
+        if (eta.flag) {
+          if (length(eta[[i]]) != length(knots[[i]])) stop("mismatch between number of knots and number of values at knots")
+          eta[[i]] <- eta[[i]][ordKnots$ix]
+        }
+      }
+    }
+    
+    names(knots) <- var.names
+    covStruct@knots <- knots
+    covStruct@param.n <- sum(sapply(knots, length))
+    covStruct@paramset.n <- as.integer(1) 
+    if (eta.flag) covStruct@eta <- eta
     
 	}
-			 	
+  
+  validObject(covStruct)
 	return(covStruct)	
 }
 

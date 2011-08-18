@@ -31,6 +31,7 @@ Exponential \tab \code{ k(x,y) = exp(-h/theta) } \cr
 Matern(3/2) \tab \code{ k(x,y) = (1+sqrt(3)*h/theta)*exp(-sqrt(3)*h/theta) } \cr
 Matern(5/2) \tab \code{ k(x,y) = (1+sqrt(5)*h/theta+(1/3)*5*(h/theta)^2)} \cr 
 \tab \code{          *exp(-sqrt(5)*h/theta)} \cr
+Power-exponential \tab \code{ k(x,y) = exp(-(h/theta)^p) } \cr
 }
 
 Here, in every dimension, the corresponding one-dimensional stationary kernel \code{k(x,y)} is replaced by \code{k(f(x),f(y))}, where \code{f} is a continuous monotonic function indexed by 2 parameters (see the references for more detail). 
@@ -79,7 +80,11 @@ Class \code{"\linkS4class{covKernel}"}, directly.
 
 \references{
 	
-Y. Xiong, W. Chen, D. Apley, and X. Ding (2007), \emph{Int. J. Numer. Meth. Engng}, A non-stationary covariance-based Kriging method for metamodelling in engineering design. 
+N.A.C. Cressie (1993), \emph{Statistics for spatial data}, Wiley series in probability and mathematical statistics.
+
+C.E. Rasmussen and C.K.I. Williams (2006), \emph{Gaussian Processes for Machine Learning}, the MIT Press, \url{http://www.GaussianProcess.org/gpml}
+
+M.L. Stein (1999), \emph{Interpolation of spatial data, some theory for kriging}, Springer.
 
 }
 
@@ -87,65 +92,10 @@ Y. Xiong, W. Chen, D. Apley, and X. Ding (2007), \emph{Int. J. Numer. Meth. Engn
 \seealso{
 	\code{\linkS4class{km}}
 	\code{\linkS4class{covTensorProduct}}
-	\code{\linkS4class{covIso}}
-	\code{\linkS4class{covKernel}}
 }
 
 
 \examples{
 showClass("covAffineScaling")
-
-###############################
-# 1D example with automatic scaling 
-###############################
-
-f11_xiong <- function (x) {
-return( sin(30*(x - 0.9)^4)*cos(2*(x - 0.9)) + (x - 0.9)/2)}
-
-t <- seq(0,1,,300)
-f <- f11_xiong(t)
-
-par(mfrow=c(1,1))
-plot(t,f,type="l", ylim=c(-1,0.6))
-
-doe <- data.frame(seq(0,1,,20))
-resp <- f11_xiong(doe)
-
-m <- km(design=doe, response=resp, scaling=TRUE, gr=TRUE, covtype="matern5_2", coef.var=1, coef.trend=0)
-
-p <- predict(m, t, "UK")$mean
-s <- predict(m, t, "UK")$sd
-
-lines(t,p,col="blue")
-lines(t,p + 2*s,col="blue")
-lines(t,p - 2*s,col="blue")
-
-###############################
-# 2D example with automatic scaling 
-###############################
-
-# a 16-points factorial design, and the corresponding response
-d <- 2; n <- 16
-design.fact <- expand.grid(seq(0,1,length=4), seq(0,1,length=4))
-design.fact <- data.frame(design.fact); 
-names(design.fact)<-c("x1", "x2")
-y <- branin(design.fact) 
-
-# graphics 
-n.grid <- 50
-x.grid <- y.grid <- seq(0,1,length=n.grid)
-design.grid <- expand.grid(x.grid, y.grid)
-response.grid <- apply(design.grid, 1, branin)
-
-par(mfrow=c(2,1))
-knots <- list(seq(from=0, to=1, length=4), seq(from=0, to=1, length=4))
-m <- km(design=design.fact, response=y, scaling=TRUE, gr=TRUE)
-predicted.values.model <- predict(m, design.grid, "UK")$mean
-sd.model <- predict(m, design.grid, "UK")$sd
-contour(x.grid, y.grid, matrix(predicted.values.model, n.grid, n.grid), 50, main="Kriging Mean")
-contour(x.grid, y.grid, matrix(sd.model, n.grid, n.grid), 50, 
-        main="Kriging standard deviation")
-
-###
 }
 \keyword{classes}

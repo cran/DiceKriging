@@ -132,4 +132,44 @@ setMethod("show", "covAffineScaling",
 	    }
 )
 
+setMethod("show", "covScaling", 
+          function(object){
+ 
+              cat("\n")
+              cat("Covar. type  :", object@name, ", with scaling \n")
+            
+              cat("Covar. coeff.")
+              if (!identical(object@known.covparam, "All")) cat(", with estimated values for eta")
+              cat(":\n")
+ 
+          		for (i in 1:object@d) {
+                knots.names <- paste("knots", "(", object@var.names[i], ")", sep = "")
+                eta.names <- paste("eta", "(", object@var.names[i], ")", sep = "")
+                param.names <- c(eta.names, knots.names)
+                param.names <- formatC(param.names, width = 12)
+                tab <- t(formatC(cbind(object@eta[[i]], object@knots[[i]]), width = 10, digits = 4, format = "f", flag = " "))
+                n.i <- length(object@knots[[i]])
+              	dimnames(tab) <- list(param.names, rep("", n.i))
+            	 print(tab, quote=FALSE)
+           	}
+               
+          	    
+	      	  	cat("\n")
+            
+            	if (identical(object@known.covparam, "All")) {
+            		cat("Variance:", object@sd2)
+            	} else {	         
+            		cat("Variance estimate:", object@sd2)
+            	}
+	         	cat("\n")
+	         
+	         	if (object@nugget.flag) {
+	         		if (object@nugget.estim) {
+	         			cat("\nNugget effect estimate:", object@nugget)
+	         		} else cat("\nNugget effect :", object@nugget)
+	         		cat("\n\n")  
+	    		}
+	    }
+)
+
 

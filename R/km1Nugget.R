@@ -31,10 +31,7 @@ function(model, envir) {
 		else cat(" used\n")
 		cat("* trend model : "); print(model@trend.formula, showEnv=FALSE)
 		cat("* covariance model : \n")
-		cat("  - type : ",  model@covariance@name)
-    if (is(model@covariance, "covIso")) cat(", isotropic")
-    if (is(model@covariance, "covAffineScaling")) cat(", with affine scaling")
-    cat("\n")
+		cat("  - type : ",  model@covariance@name, "\n")
 	
 		cat("  - nugget : unknown homogenous nugget effect ")
 		#if (!is.null(nugget)) cat("with initial value : ", nugget)

@@ -32,6 +32,7 @@ Exponential \tab \code{ k(x,y) = exp(-h/theta) } \cr
 Matern(3/2) \tab \code{ k(x,y) = (1+sqrt(3)*h/theta)*exp(-sqrt(3)*h/theta) } \cr
 Matern(5/2) \tab \code{ k(x,y) = (1+sqrt(5)*h/theta+(1/3)*5*(h/theta)^2)} \cr 
 \tab \code{          *exp(-sqrt(5)*h/theta)} \cr
+Power-exponential \tab \code{ k(x,y) = exp(-(h/theta)^p) } \cr
 }
 }
 
@@ -116,8 +117,6 @@ M.L. Stein (1999), \emph{Interpolation of spatial data, some theory for kriging}
 \seealso{
 	\code{\link{km}}
 	\code{\linkS4class{covTensorProduct}}
-	\code{\linkS4class{covAffineScaling}}
-	\code{\linkS4class{covKernel}}
 }
 \examples{
 showClass("covIso")

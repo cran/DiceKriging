@@ -1,12 +1,4 @@
-## change / DiceKriging 1.1
+## change / DiceKriging 1.2
 
-April, 15
-
-1. Addition of an option "isotropic", building isotropic covariance kernels from tensor-product ones.
-Technically: 
-- a new class "covIso" has been created, 
-- the existing method "show" has been extended to this class,
-- the functions "covMatrix", "covMat1Mat2", "covMatrixGrad", "covVector.dx", "covParametersBounds",  are now implemented as METHODS.
-
-2. covAffineScaling, with 2 knots per dimension. The analytical gradient has been implemented.
+* addition of the class "covScaling", corresponding to the general case of scaling (varying number of knots per dimension). Implementation of scalingFun and scalingGrad in C
 

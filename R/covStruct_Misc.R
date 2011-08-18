@@ -44,6 +44,16 @@ setMethod("coefficients",
             attr(co, "type") <- type
             co
           })
+          
+setMethod("coefficients",
+          signature(object = "covScaling"),
+          function(object, type = c("sd2", "eta"), ...) {
+            type <- match.arg(type)
+            if (type == "sd2") co <- object@sd2
+            else if (type == "eta")  co <- object@eta
+            attr(co, "type") <- type
+            co
+          })
 
 ##=================================================================
 ## summary should in the future return objects with the right class
@@ -87,15 +97,20 @@ summary.covAffineScaling <- function(object, ...) {
   ans[["input"]] <- object@d
   ans[["inputnames"]] <- object@var.names
   ans[["kernelname"]] <- object@name
-  ans[["ranges"]] <- object@range.val
-  names(ans[["ranges"]]) <- object@var.names
+  ans[["knots"]] <- object@knots
+  ans[["eta"]] <- object@eta
+  names(ans[["eta"]]) <- object@var.names
   ans 
-  
 }
 
 setMethod("summary", signature(object = "covAffineScaling"),
           definition = summary.covAffineScaling
           )
+
+setMethod("summary", signature(object = "covScaling"),
+          definition = summary.covAffineScaling
+          )
+
 
 ##=================================================================
 ## ninput
@@ -109,6 +124,8 @@ if(!isGeneric("ninput")) {
 setMethod("ninput", signature(x = "covIso"), function(x) x@d)
 setMethod("ninput", signature(x = "covTensorProduct"), function(x) x@d)
 setMethod("ninput", signature(x = "covAffineScaling"), function(x) x@d)
+setMethod("ninput", signature(x = "covScaling"), function(x) x@d)
+
 
 ##=================================================================
 ## inputnames
@@ -122,6 +139,7 @@ if(!isGeneric("inputnames")) {
 setMethod("inputnames", signature(x = "covIso"), function(x) x@var.names)
 setMethod("inputnames", signature(x = "covTensorProduct"), function(x) x@var.names)
 setMethod("inputnames", signature(x = "covAffineScaling"), function(x) x@var.names)
+setMethod("inputnames", signature(x = "covScaling"), function(x) x@var.names)
 
 # below: beta version. One must also replace the names in X and y, for consistency.
 # 
@@ -155,6 +173,7 @@ if(!isGeneric("kernelname")) {
 setMethod("kernelname", signature(x = "covIso"), function(x) x@name)
 setMethod("kernelname", signature(x = "covTensorProduct"), function(x) x@name)
 setMethod("kernelname", signature(x = "covAffineScaling"), function(x) x@name)
+setMethod("kernelname", signature(x = "covScaling"), function(x) x@name)
 
 ##=================================================================
 ## nuggetvalue
@@ -168,6 +187,7 @@ if(!isGeneric("nuggetvalue")) {
 setMethod("nuggetvalue", signature(x = "covIso"), function(x) x@nugget)
 setMethod("nuggetvalue", signature(x = "covTensorProduct"), function(x) x@nugget)
 setMethod("nuggetvalue", signature(x = "covAffineScaling"), function(x) x@nugget)
+setMethod("nuggetvalue", signature(x = "covScaling"), function(x) x@nugget)
 
 setGeneric("nuggetvalue<-",function(x, value){ standardGeneric("nuggetvalue<-") })
 
@@ -186,6 +206,7 @@ nuggetvalueFun <- function(x, value) {
 setReplaceMethod("nuggetvalue", signature(x = "covTensorProduct", value = "numeric"), nuggetvalueFun)
 setReplaceMethod("nuggetvalue", signature(x = "covIso", value = "numeric"), nuggetvalueFun)             
 setReplaceMethod("nuggetvalue", signature(x = "covAffineScaling", value = "numeric"), nuggetvalueFun)
+setReplaceMethod("nuggetvalue", signature(x = "covScaling", value = "numeric"), nuggetvalueFun)
 
 ##=================================================================
 ## nuggetflag
@@ -199,4 +220,5 @@ if(!isGeneric("nuggetflag")) {
 setMethod("nuggetflag", signature(x = "covIso"), function(x) x@nugget.flag)
 setMethod("nuggetflag", signature(x = "covTensorProduct"), function(x) x@nugget.flag)
 setMethod("nuggetflag", signature(x = "covAffineScaling"), function(x) x@nugget.flag)
+setMethod("nuggetflag", signature(x = "covScaling"), function(x) x@nugget.flag)
 

@@ -49,7 +49,13 @@ function(object, X, noise.var=NULL) {
 
 setMethod("covMatrix", "covAffineScaling", 
 function(object, X, noise.var=NULL) {
-	covMatrix(extract.covIso(object), X=scalingFun(X, knots=object@knots, eta=object@eta), noise.var=noise.var)
+	covMatrix(extract.covIso(object), X=affineScalingFun(X, knots=object@knots, eta=object@eta), noise.var=noise.var)
+}
+)
+
+setMethod("covMatrix", "covScaling", 
+function(object, X, noise.var=NULL) {
+  covMatrix(extract.covIso(object), X=scalingFun(X, knots=object@knots, eta=object@eta), noise.var=noise.var)
 }
 )
 
@@ -120,29 +126,62 @@ function(object, X, C, k) {
 }
 )
 
-envir.covAffineScaling <- new.env()
+envir.covScaling <- envir.covAffineScaling <- new.env()
 
 setMethod("covMatrixDerivative", "covAffineScaling", 
 function(object, X, C, k, envir=envir.covAffineScaling) {
+  # NOTE : this function MUST be used in a loop over the index k, from 1 to k.max
   i <- k
   k <- floor((i-1)/2)+1
   l <- (i-1)%%2+1
   if (l==1) {
    object.covTensorProduct <- as(extract.covIso(object), "covTensorProduct")
-   fX <- scalingFun(X, knots=object@knots, eta=object@eta)
-   #Ciso <- covMatrix(object.covTensorProduct, fX)[[1]]
-   #Ciso <- Ciso / object.covTensorProduct@sd2
+   fX <- affineScalingFun(X, knots=object@knots, eta=object@eta)
    Dk <- covMatrixDerivative.dx.covTensorProduct(object=object.covTensorProduct, 
                        X=fX, C=C, k=k)
-    assign("Dk", Dk, envir=envir)
+   assign("Dk", Dk, envir=envir)
   } else {
     Dk <- get("Dk", envir=envir) 
   }
-  df.dkl <- scalingFunGrad(X=X, knots=object@knots, k=k)[,l]
+  df.dkl <- affineScalingGrad(X=X, knots=object@knots, k=k)[,l]
   A <- outer(df.dkl, df.dkl, "-")
   return(Dk*A)
 }
 )
+
+setMethod("covMatrixDerivative", "covScaling", 
+function(object, X, C, k, envir=envir.covScaling) {
+  # NOTE : this function MUST be used in a loop over the index k, from 1 to k.max
+  i <- k
+  if (i==1) {
+    knots.n <- as.numeric(sapply(object@knots, length))
+    k.vec <- rep(1:object@d, times=knots.n)
+    l.vec <- sequence(knots.n)
+    assign("k.vec", k.vec, envir=envir)
+    assign("l.vec", l.vec, envir=envir)
+  } else {
+    k.vec <- get("k.vec", envir=envir)
+    l.vec <- get("l.vec", envir=envir)
+  }
+  k <- k.vec[i]
+  l <- l.vec[i]
+  
+  if (l==1) {
+    object.covTensorProduct <- as(extract.covIso(object), "covTensorProduct")
+    fX <- scalingFun(X, knots=object@knots, eta=object@eta)
+    Dk <- covMatrixDerivative.dx.covTensorProduct(object=object.covTensorProduct, 
+                       X=fX, C=C, k=k)   
+    assign("Dk", Dk, envir=envir)
+  } else {
+    Dk <- get("Dk", envir=envir) 
+  }
+  df.dkl <- scalingGrad(X=X, knots=object@knots, k)[,l]
+  A <- outer(df.dkl, df.dkl, "-")
+  return(Dk*A)
+}
+)
+
+
 
 
 ## ************************
@@ -245,7 +284,12 @@ function(object, X1, X2, nugget.flag=FALSE) {
 
 setMethod("covMat1Mat2", "covAffineScaling", 
 function(object, X1, X2, nugget.flag=FALSE) {
-	covMat1Mat2(extract.covIso(object), X1=scalingFun(X1, knots=object@knots, eta=object@eta), X2=scalingFun(X2, knots=object@knots, eta=object@eta), nugget.flag=nugget.flag)
+	covMat1Mat2(extract.covIso(object), X1=affineScalingFun(X1, knots=object@knots, eta=object@eta), X2=affineScalingFun(X2, knots=object@knots, eta=object@eta), nugget.flag=nugget.flag)
 }
 )
 
+setMethod("covMat1Mat2", "covScaling", 
+function(object, X1, X2, nugget.flag=FALSE) {
+  covMat1Mat2(extract.covIso(object), X1=scalingFun(X1, knots=object@knots, eta=object@eta), X2=scalingFun(X2, knots=object@knots, eta=object@eta), nugget.flag=nugget.flag)
+}
+)

@@ -58,9 +58,6 @@ To create a \code{km} object, use \code{\link{km}}. See also this function for m
 
 \author{ O. Roustant, D. Ginsbourger}
 
-\seealso{ \code{\link{km}} for more details about slots and to create a \code{km} object, \code{\link{covStruct.create}} to construct a covariance structure, and \code{\linkS4class{covTensorProduct}}, 
-\code{\linkS4class{covIso}}, \code{\linkS4class{covTensorProduct}}, 
-\code{\linkS4class{covKernel}} for the S4 covariance classes defined 
-in this package.}
+\seealso{ \code{\link{km}} for more details about slots and to create a \code{km} object, \code{\link{covStruct.create}} to construct a covariance structure, and \code{\link{covTensorProduct-class}} for the S4 covariance class defined in this package.}
 
 \keyword{classes}

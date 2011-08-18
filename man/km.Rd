@@ -11,7 +11,7 @@ km(formula=~1, design, response, covtype="matern5_2",
    coef.trend = NULL, coef.cov = NULL, coef.var = NULL,
    nugget = NULL, nugget.estim=FALSE, noise.var=NULL, penalty = NULL, 
    optim.method = "BFGS", lower = NULL, upper = NULL, parinit = NULL, 
-   control = NULL, gr = TRUE, iso=FALSE, scaling=FALSE)
+   control = NULL, gr = TRUE, iso=FALSE, scaling=FALSE, knots=NULL)
 }
 
 
@@ -35,7 +35,8 @@ km(formula=~1, design, response, covtype="matern5_2",
    \item{control}{ an optional list of control parameters for optimization. To avoid printing information in the command line during optimization progress, indicate \code{trace=FALSE}. For method \code{"BFGS"}, \code{pop.size} is the number of candidate initial points generated before optimization starts (see \code{parinit} above). Default is 20. For method \code{"gen"}, one can control  \code{"pop.size"}  (default : min(20, 4+3*log(nb of variables) ),  \code{"max.generations"} (5),  \code{"wait.generations"} (2) and  \code{"BFGSburnin"} (0) of function  \code{"genoud"} (see \code{\link[rgenoud]{genoud}}). Another tunable paramater is \code{upper.alpha} (1-1e-8) for nugget estimation (see \code{\link{km1Nugget}}). Numbers into brackets are the default values. }
    \item{gr}{ an optional boolean indicating whether the analytical gradient should be used. Default is \code{TRUE}.}
    \item{iso}{ an optional boolean that can be used to force a tensor-product covariance structure (see \code{\link{covTensorProduct-class}}) to have a range parameter common to all dimensions. Default is \code{FALSE}. Not used (at this stage) for the power-exponential type.}
-   \item{scaling}{ an optional boolean indicating whether a scaling on the covariance structure should be used. Not used (at this stage) for the power-exponential type.}
+   \item{scaling}{ an optional boolean indicating whether a scaling on the covariance structure should be used.}
+   \item{knots}{ an optional list of knots for scaling. The j-th element is a vector containing the knots for dimension j. If \code{scaling=TRUE} and knots are not specified, than knots are fixed to 0 and 1 in each dimension (which corresponds to affine scaling for the domain [0,1]^d).}
 }
 
 \value{
@@ -224,7 +225,6 @@ text(x, y, labels=MC_numbers, pos=3)
 # Checking parameter estimation 
 # -----------------------------
 
-\dontrun{
 d <- 3     		# problem dimension
 n <- 40			# size of the experimental design
 design <- matrix(runif(n*d), n, d)
@@ -286,58 +286,38 @@ boxplot(sigma2.estimate, xlab="sigma2")
 abline(h=sigma^2, col="red")
 
 close.screen(all = TRUE)  
+
+##############################################################
+# Kriging with non-linear scaling on Xiong et al.'s function #
+##############################################################
+
+f11_xiong <- function(x){ 
+return( sin(30*(x - 0.9)^4)*cos(2*(x - 0.9)) + (x - 0.9)/2)
 }
-
-###############################
-# 1D example with automatic scaling 
-###############################
-
-f11_xiong <- function (x) {
-return( sin(30*(x - 0.9)^4)*cos(2*(x - 0.9)) + (x - 0.9)/2)}
 
 t <- seq(0,1,,300)
 f <- f11_xiong(t)
+par(mfrow=c(1,1))
 
 par(mfrow=c(1,1))
-plot(t,f,type="l", ylim=c(-1,0.6))
+plot(t,f,type="l", ylim=c(-1,0.6), lwd=2)
 
-doe <- data.frame(x=seq(0,1,,20))
+doe <- data.frame(seq(0,1,,20))
 resp <- f11_xiong(doe)
 
-m <- km(design=doe, response=resp, scaling=TRUE, gr=TRUE, covtype="matern5_2", coef.var=1, coef.trend=0)
+knots <- list(  c(0,0.5,1) ) 
+eta <- list(c(15, 2, 0.5))
+m <- km(design=doe, response=resp, scaling=TRUE, gr=TRUE, 
+knots=knots, covtype="matern5_2",  coef.var=1, coef.trend=0)
 
 p <- predict(m, t, "UK")$mean
 s <- predict(m, t, "UK")$sd
 
-lines(t,p,col="blue")
+plot(t,f,type="l", ylim=c(-1,0.6), lwd=2)
+
+lines(t,p,col="blue", lty=2, lwd=2)
 lines(t,p + 2*s,col="blue")
 lines(t,p - 2*s,col="blue")
 
-###############################
-# 2D example with automatic scaling 
-###############################
-
-# a 16-points factorial design, and the corresponding response
-d <- 2; n <- 16
-design.fact <- expand.grid(seq(0,1,length=4), seq(0,1,length=4))
-design.fact <- data.frame(design.fact); 
-names(design.fact)<-c("x1", "x2")
-y <- branin(design.fact) 
-
-# graphics 
-n.grid <- 50
-x.grid <- y.grid <- seq(0,1,length=n.grid)
-design.grid <- expand.grid(x.grid, y.grid)
-response.grid <- apply(design.grid, 1, branin)
-
-par(mfrow=c(2,1))
-knots <- list(seq(from=0, to=1, length=4), seq(from=0, to=1, length=4))
-m <- km(design=design.fact, response=y, scaling=TRUE, gr=TRUE)
-predicted.values.model <- predict(m, design.grid, "UK")$mean
-sd.model <- predict(m, design.grid, "UK")$sd
-contour(x.grid, y.grid, matrix(predicted.values.model, n.grid, n.grid), 50, main="Kriging Mean")
-contour(x.grid, y.grid, matrix(sd.model, n.grid, n.grid), 50, 
-        main="Kriging standard deviation")
-
-###
+abline(v=knots[[1]], lty=2, col="green")
 }

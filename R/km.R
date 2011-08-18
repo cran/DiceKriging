@@ -2,7 +2,7 @@
 function(formula=~1, design, response, covtype="matern5_2",  
 			 coef.trend=NULL, coef.cov=NULL, coef.var=NULL,
          nugget=NULL, nugget.estim=FALSE, noise.var=NULL, penalty=NULL, 
-         optim.method="BFGS", lower=NULL, upper=NULL, parinit=NULL, control=NULL, gr=TRUE, iso=FALSE, scaling=FALSE) {
+         optim.method="BFGS", lower=NULL, upper=NULL, parinit=NULL, control=NULL, gr=TRUE, iso=FALSE, scaling=FALSE, knots=NULL) {
 	
 	model <- new("km")
 	
@@ -35,7 +35,11 @@ function(formula=~1, design, response, covtype="matern5_2",
 		known.covparam <- "None"
 	}
 	
-	model@covariance <- covStruct.create(covtype=covtype, d=model@d, known.covparam=known.covparam, coef.cov=coef.cov, coef.var=coef.var, nugget=nugget, nugget.estim=nugget.estim, nugget.flag=((length(nugget)!=0) | nugget.estim),  iso=iso, scaling=scaling, var.names=colnames(X))
+	model@covariance <- covStruct.create(covtype=covtype, d=model@d, 
+  known.covparam=known.covparam, var.names=colnames(X), 
+  coef.cov=coef.cov, coef.var=coef.var, nugget=nugget, 
+  nugget.estim=nugget.estim, nugget.flag=((length(nugget)!=0) | nugget.estim),  
+  iso=iso, scaling=scaling, knots=knots)
 
 	# Now, at least some parameters are unknown
 	
@@ -43,7 +47,7 @@ function(formula=~1, design, response, covtype="matern5_2",
 		model@trend.coef <- as.numeric(coef.trend)
 		model@param.estim <- FALSE
 		model@known.param <- "All"	
-#		validObject(model, complete=TRUE)
+		validObject(model)
 		model <- computeAuxVariables(model)
 		return(model)
 	}		
@@ -115,7 +119,7 @@ function(formula=~1, design, response, covtype="matern5_2",
 	environment(km1Nugget) <- environment(km1Nugget.init) <- envir.logLik
 	
 	validObject(model, complete=TRUE)
-	
+  
  	if ((length(noise.var)!=0) | ((length(nugget)!=0) & (nugget.estim==FALSE))) {
 		model@case <- "Nuggets"
 		f <- kmNuggets

@@ -10,7 +10,7 @@ importFrom("stats", simulate)
 
 
 ## S4
-exportClasses(covTensorProduct, covIso, covKernel, km, covAffineScaling)
+exportClasses(covTensorProduct, covIso, covScaling, covKernel, km, covAffineScaling)
 ## All methods, for own or "foreign" generics:
 exportMethods(show, plot, predict, simulate, covMatrix, covMat1Mat2, 
 covMatrixDerivative, covVector.dx, covParametersBounds, coefficients, summary, inputnames, ninput, kernelname, nuggetvalue, "nuggetvalue<-", nuggetflag)
@@ -48,7 +48,9 @@ export(#as,
        SCAD.derivative, 
        SCAD, 
        scalingFun,
-       scalingFunGrad,
+       scalingGrad,       
+       affineScalingFun,
+       affineScalingGrad,
        #show.km, 
        #simulate.km,
        trendMatrix.update)

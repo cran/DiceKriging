@@ -47,5 +47,13 @@ setMethod("covParametersBounds", "covAffineScaling",
 	}
 )
 
-
+setMethod("covParametersBounds", "covScaling", 
+  function(object, X){
+    knots.n <- sapply(object@knots, length)
+    object.tp <- as(extract.covIso(object), "covTensorProduct")
+		bounds <- covParametersBounds(object=object.tp, X=X)
+    bounds <- list(lower=rep(1/bounds$upper, times=knots.n), upper=rep(1/bounds$lower, times=knots.n))
+    return(bounds)
+	}
+)
 
