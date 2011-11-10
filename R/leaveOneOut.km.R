@@ -41,6 +41,9 @@ function(model, type) {
 		
 			sigma2[i] <- pmax(model@covariance@sd2 - sigma2.1 + sigma2.2, 0)
 			sigma2[i] <- as.numeric(sigma2[i])
+      if (model@noise.flag) {     # case of noisy observations
+        sigma2[i] <- sigma2[i] +  model@noise.var[i]
+      }
 			
 		}		
 	}	

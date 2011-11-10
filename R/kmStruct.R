@@ -102,6 +102,7 @@ plot.km <- function(x, kriging.type="UK", ...) {
 	plot(resid, xlab="Index", ylab="Standardized residuals", main="Standardized residuals", ...)
 	qqnorm(resid, main="Normal QQ-plot of standardized residuals") 
 	qqline(resid)
+  par(mfrow=c(1,1))
 	
 	invisible(pred)
 }
@@ -125,26 +126,24 @@ setMethod("plot", "km",
 # **********************************************
 
 
-predict.km <- function(object, newdata, type, se.compute=TRUE, cov.compute=FALSE, ...) {
+predict.km <- function(object, newdata, type, se.compute=TRUE, cov.compute=FALSE, checkNames=FALSE, ...) {
 	# newdata : n x d
 	
 	X <- object@X
 	y <- object@y
 	
-	newdata <- as.matrix(newdata)
-	
-	dim.newdata <- dim(newdata)
-	m <- dim.newdata[1]
-	d.newdata <- dim.newdata[2]
-	
-	# some important controls
-	if (!identical(d.newdata, object@d)) stop("newdata must have the same numbers of columns than the experimental design")
-	if (!identical(colnames(newdata), colnames(X))) {
-	#	warning("column names mismatch between 'newdata' and the experimental design - the columns of 'newdata' are interpreted in the same order as the experimental design names")
-		colnames(newdata) <- colnames(X)
+	if (checkNames) {
+		newdata <- checkNames(X1=X, X2=newdata, X1.name="the design", X2.name="newdata")
+	} else {
+    newdata <- as.matrix(newdata)
+  	d.newdata <- ncol(newdata)
+	  if (!identical(d.newdata, object@d)) stop("newdata must have the same numbers of columns than the experimental design")
+    if (!identical(colnames(newdata), colnames(X))) {
+    #  warning("column names mismatch between 'newdata' and the experimental design - the columns of 'newdata' are interpreted in the same order as the experimental design names")
+    colnames(newdata) <- colnames(X)
+    }
 	}
 	
-
 	T <- object@T
 	z <- object@z
 	M <- object@M
@@ -253,35 +252,36 @@ setMethod("predict", "km",
 # 			     S I M U L A T E  METHOD
 # **********************************************
 
-simulate.km <- function(object, nsim=1, seed=NULL, newdata=NULL, cond=FALSE, nugget.sim=0, ...) {
+simulate.km <- function(object, nsim=1, seed=NULL, newdata=NULL, cond=FALSE, nugget.sim=0, checkNames=FALSE, ...) {
 	
 	if (!is.numeric(nugget.sim)) stop("'nugget.sim' must be a number")
 	if (nugget.sim<0) stop("nugget.sim (homogenous to a variance) must not be negative")
 	if (!is.logical(cond)) stop("'cond' must be TRUE/FALSE")
-	
-	if (object@noise.flag) {
-		if (!is.null(newdata)) warning("for heteroscedastic noise, simulation is possible only at design points: 'newdata' is ignored")
-		newdata <- object@X		
+	if ((!is.null(newdata)) & (checkNames)) newdata <- checkNames(X1=object@X, X2=newdata, X1.name="the design", X2.name="newdata")
+    
+	#if (object@noise.flag) {
+	#	if (!is.null(newdata)) warning("for heteroscedastic noise, simulation is possible only at design points: 'newdata' is ignored")
+	#	newdata <- object@X		
+	#	F.newdata <- object@F
+	#	T.newdata <- object@T
+	#} else {
+	if (is.null(newdata)) {
+		newdata <- object@X
 		F.newdata <- object@F
 		T.newdata <- object@T
 	} else {
-		if (is.null(newdata)) {
-			newdata <- object@X
-			F.newdata <- object@F
-			T.newdata <- object@T
-		} else {
-			newdata <- as.matrix(newdata)
-			m <- nrow(newdata)
-			if (!identical(ncol(newdata), object@d)) 
-   				stop("newdata must have the same numbers of columns than the experimental design")
-   			if (!identical(colnames(newdata), colnames(object@X))) 
-   				colnames(newdata) <- colnames(object@X)
-  
-			F.newdata <- model.matrix(object@trend.formula, data = data.frame(newdata))
-			Sigma <- covMatrix(object@covariance, newdata)[[1]]
-			T.newdata <- chol(Sigma + diag(nugget.sim, m, m))
-		}
-	}
+		newdata <- as.matrix(newdata)
+		m <- nrow(newdata)
+		if (!identical(ncol(newdata), object@d)) 
+   		stop("newdata must have the same numbers of columns than the experimental design")
+   		if (!identical(colnames(newdata), colnames(object@X))) {
+         colnames(newdata) <- colnames(object@X)
+   		}
+		  F.newdata <- model.matrix(object@trend.formula, data = data.frame(newdata))
+		  Sigma <- covMatrix(object@covariance, newdata)[[1]]
+		  T.newdata <- chol(Sigma + diag(nugget.sim, m, m))
+	  }
+  #}
 		
 	y.trend <- F.newdata %*% object@trend.coef
 	
@@ -291,27 +291,24 @@ simulate.km <- function(object, nsim=1, seed=NULL, newdata=NULL, cond=FALSE, nug
 		white.noise <- matrix(rnorm(m*nsim), m, nsim)
 		y.rand <- t(T.newdata) %*% white.noise
 		y <- matrix(y.trend, m, nsim) + y.rand
-
 	} else {				# simulations conditional to the observations
-		if (object@noise.flag) {
-			stop("conditional simulations not available for heterogeneous observations")
-		} else {
-			Sigma21 <- covMat1Mat2(object@covariance, X1=object@X, X2=newdata, nugget.flag=FALSE)           # size n x m
-			Tinv.Sigma21 <- backsolve(t(object@T), Sigma21, upper.tri = FALSE)     # t(T22)^(-1) * Sigma21,  size  n x m
-			y.trend.cond <- y.trend + t(Tinv.Sigma21) %*% object@z                 # size m x 1
+		#if (object@noise.flag) {
+		#	stop("conditional simulations not available for heterogeneous observations")
+		#} else {
+		Sigma21 <- covMat1Mat2(object@covariance, X1=object@X, X2=newdata, nugget.flag=FALSE)           # size n x m
+		Tinv.Sigma21 <- backsolve(t(object@T), Sigma21, upper.tri = FALSE)     # t(T22)^(-1) * Sigma21,  size  n x m
+		y.trend.cond <- y.trend + t(Tinv.Sigma21) %*% object@z                 # size m x 1
 			
-			if (!is.null(newdata)) {
-				Sigma11 <- Sigma
-			} else Sigma11 <- t(object@T) %*% object@T	
+		if (!is.null(newdata)) {
+			Sigma11 <- Sigma
+		} else Sigma11 <- t(object@T) %*% object@T	
 			
-			Sigma.cond <- Sigma11 - t(Tinv.Sigma21) %*% Tinv.Sigma21          # size m x m
-			T.cond <- chol(Sigma.cond + diag(nugget.sim, m, m))			
-			white.noise <- matrix(rnorm(m*nsim), m, nsim)
-			y.rand.cond <- t(T.cond) %*% white.noise
-			y <- matrix(y.trend.cond, m, nsim) + y.rand.cond
-		}
-		
-	}
+		Sigma.cond <- Sigma11 - t(Tinv.Sigma21) %*% Tinv.Sigma21          # size m x m
+		T.cond <- chol(Sigma.cond + diag(nugget.sim, m, m))			
+		white.noise <- matrix(rnorm(m*nsim), m, nsim)
+		y.rand.cond <- t(T.cond) %*% white.noise
+		y <- matrix(y.trend.cond, m, nsim) + y.rand.cond	
+  }
 	
 	return(t(y))
 

@@ -1,3 +1,13 @@
+## DiceKriging 1.3.2. 
+
+## change / DiceKriging 1.3
+
+* extension of methods "simulate.km" and "plot.km" to noisy observations.
+* addition of a consistency check between the input names in the design and in newdata. It can be used for prediction and simulation by turning the argument "checkNames" to TRUE. The checking stage is done in the new function "checkNames".  
+* creation of the function "kmData", which allows the user to give the response and the design in a single "data" argument (as for lm). 
+* modifications in the documentation of km (examples), predict.km and simulate.km (section warning + examples).
+
+
 ## change / DiceKriging 1.2
 
 * addition of the class "covScaling", corresponding to the general case of scaling (varying number of knots per dimension). Implementation of scalingFun and scalingGrad in C

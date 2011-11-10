@@ -12,8 +12,8 @@ Estimation, validation and prediction of kriging models.
 \tabular{ll}{
 Package: \tab DiceKriging\cr
 Type: \tab Package\cr
-Version: \tab 1.3\cr
-Date: \tab 2011-08-18\cr
+Version: \tab 1.3.2\cr
+Date: \tab 2011-11-10\cr
 License: \tab GPL-3 \cr
 }
 }
@@ -70,7 +70,7 @@ Y. Xiong, W. Chen, D. Apley, and X. Ding (2007), \emph{Int. J. Numer. Meth. Engn
 }
 
 \note{
-A previous version of this package was conducted within the frame of the DICE (Deep Inside Computer Experiments) Consortium between ARMINES, Renault, EDF, IRSN, ONERA and TOTAL S.A. (http://dice-emse.fr/).
+A previous version of this package was conducted within the frame of the DICE (Deep Inside Computer Experiments) Consortium between ARMINES, Renault, EDF, IRSN, ONERA and TOTAL S.A. (http://dice.emse.fr/).
 
 The authors wish to thank Laurent Carraro, Delphine Dupuy and Celine Helbert for fruitful discussions about the structure of the code. They also thank Gregory Six and Gilles Pujol for their advices on practical implementation issues, as well as the DICE members for useful feedbacks.
 

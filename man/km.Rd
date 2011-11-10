@@ -75,7 +75,7 @@ C.E. Rasmussen and C.K.I. Williams (2006), \emph{Gaussian Processes for Machine 
 
 \author{ O. Roustant, D. Ginsbourger, Ecole des Mines de St-Etienne. }
 
-\seealso{ \code{\link{show.km}}, \code{\link{predict.km}}, \code{\link{plot.km}}. Some programming details and initialization choices can be found in \code{\link{kmNoNugget}}, \code{\link{kmNoNugget.init}}, \code{\link{km1Nugget}}, \code{\link{km1Nugget.init}}, \code{\link{kmNuggets}} and \code{\link{kmNuggets.init}} }
+\seealso{ \code{\link{kmData}} for another interface with the data, \code{\link{show.km}}, \code{\link{predict.km}}, \code{\link{plot.km}}. Some programming details and initialization choices can be found in \code{\link{kmNoNugget}}, \code{\link{kmNoNugget.init}}, \code{\link{km1Nugget}}, \code{\link{km1Nugget.init}}, \code{\link{kmNuggets}} and \code{\link{kmNuggets.init}} }
 
 \keyword{models}
 \keyword{htest}
@@ -87,9 +87,8 @@ C.E. Rasmussen and C.K.I. Williams (2006), \emph{Gaussian Processes for Machine 
 
 # a 16-points factorial design, and the corresponding response
 d <- 2; n <- 16
-design.fact <- expand.grid(seq(0,1,length=4), seq(0,1,length=4))
-design.fact <- data.frame(design.fact); names(design.fact)<-c("x1", "x2")
-y <- branin(design.fact) 
+design.fact <- expand.grid(x1=seq(0,1,length=4), x2=seq(0,1,length=4))
+y <- apply(design.fact, 1, branin) 
 
 # kriging model 1 : matern5_2 covariance structure, no trend, no nugget effect
 m1 <- km(design=design.fact, response=y)
@@ -101,7 +100,7 @@ m2 <- km(~.^2, design=design.fact, response=y)
 # graphics 
 n.grid <- 50
 x.grid <- y.grid <- seq(0,1,length=n.grid)
-design.grid <- expand.grid(x.grid, y.grid)
+design.grid <- expand.grid(x1=x.grid, x2=y.grid)
 response.grid <- apply(design.grid, 1, branin)
 predicted.values.model1 <- predict(m1, design.grid, "UK")$mean
 predicted.values.model2 <- predict(m2, design.grid, "UK")$mean
@@ -287,9 +286,9 @@ abline(h=sigma^2, col="red")
 
 close.screen(all = TRUE)  
 
-##############################################################
-# Kriging with non-linear scaling on Xiong et al.'s function #
-##############################################################
+# ----------------------------------------------------------
+# Kriging with non-linear scaling on Xiong et al.'s function
+# ----------------------------------------------------------
 
 f11_xiong <- function(x){ 
 return( sin(30*(x - 0.9)^4)*cos(2*(x - 0.9)) + (x - 0.9)/2)
@@ -297,12 +296,10 @@ return( sin(30*(x - 0.9)^4)*cos(2*(x - 0.9)) + (x - 0.9)/2)
 
 t <- seq(0,1,,300)
 f <- f11_xiong(t)
-par(mfrow=c(1,1))
 
-par(mfrow=c(1,1))
 plot(t,f,type="l", ylim=c(-1,0.6), lwd=2)
 
-doe <- data.frame(seq(0,1,,20))
+doe <- data.frame(x=seq(0,1,,20))
 resp <- f11_xiong(doe)
 
 knots <- list(  c(0,0.5,1) ) 

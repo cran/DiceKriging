@@ -234,6 +234,9 @@ covMat1Mat2.covTensorProduct <- function(object, X1, X2, nugget.flag=FALSE) {
 	# X1 : matrix n1 x d - containing training points
 	# X2 : matrix n2 x d - containing test points
 	
+	# X1 <- as.matrix(X1)
+	# X2 <- checkNames(X1, X2)
+	
 	n1 <- nrow(X1)
 	n2 <- nrow(X2)
 	d <- ncol(X1)
