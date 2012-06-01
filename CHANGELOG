@@ -1,5 +1,9 @@
 ## DiceKriging 1.3.2. 
 
+## change / DiceKriging 1.3.2
+* the checkNames option is now TRUE by default, and produces a warning instead of an error. The new version will produce an error.
+
+
 ## change / DiceKriging 1.3
 
 * extension of methods "simulate.km" and "plot.km" to noisy observations.

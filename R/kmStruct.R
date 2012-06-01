@@ -113,10 +113,11 @@ if(!isGeneric("plot")) {
 	)
 }
 
-setMethod("plot", "km", 
-	function(x, y="missing", kriging.type="UK", ...) {
-		plot.km(x=x, kriging.type=kriging.type, ...)
-	}
+setMethod("plot", 
+          signature(x="km"), 
+	        function(x, y=NULL, kriging.type="UK", ...){
+		        plot.km(x=x, kriging.type=kriging.type, ...)
+	        }
 )
 
 
@@ -126,7 +127,7 @@ setMethod("plot", "km",
 # **********************************************
 
 
-predict.km <- function(object, newdata, type, se.compute=TRUE, cov.compute=FALSE, checkNames=FALSE, ...) {
+predict.km <- function(object, newdata, type, se.compute=TRUE, cov.compute=FALSE, checkNames=TRUE, ...) {
 	# newdata : n x d
 	
 	X <- object@X
@@ -242,8 +243,9 @@ if(!isGeneric("predict")) {
 }
 
 setMethod("predict", "km", 
-	function(object, newdata, type, se.compute=TRUE, cov.compute=FALSE, ...) {
-		predict.km(object=object, newdata=newdata, type=type, se.compute=se.compute, cov.compute=cov.compute, ...)
+	function(object, newdata, type, se.compute=TRUE, cov.compute=FALSE, checkNames=TRUE, ...) {
+		predict.km(object=object, newdata=newdata, type=type, se.compute=se.compute, 
+               cov.compute=cov.compute, checkNames=checkNames, ...)
 	}
 )
 
@@ -252,7 +254,7 @@ setMethod("predict", "km",
 # 			     S I M U L A T E  METHOD
 # **********************************************
 
-simulate.km <- function(object, nsim=1, seed=NULL, newdata=NULL, cond=FALSE, nugget.sim=0, checkNames=FALSE, ...) {
+simulate.km <- function(object, nsim=1, seed=NULL, newdata=NULL, cond=FALSE, nugget.sim=0, checkNames=TRUE, ...) {
 	
 	if (!is.numeric(nugget.sim)) stop("'nugget.sim' must be a number")
 	if (nugget.sim<0) stop("nugget.sim (homogenous to a variance) must not be negative")
@@ -322,8 +324,9 @@ if(!isGeneric("simulate")) {
 }
 
 setMethod("simulate", "km", 
-	function(object, nsim=1, seed=NULL, newdata=NULL, cond=FALSE, nugget.sim=0, ...) {
-		simulate.km(object=object, nsim=nsim, newdata=newdata, cond=cond, nugget.sim=nugget.sim, ...)
+	function(object, nsim=1, seed=NULL, newdata=NULL, cond=FALSE, nugget.sim=0, checkNames=TRUE, ...) {
+		simulate.km(object=object, nsim=nsim, newdata=newdata, cond=cond, 
+                nugget.sim=nugget.sim, checkNames=checkNames, ...)
 	}
 )
 

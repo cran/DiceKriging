@@ -1,8 +1,8 @@
 \name{km-class}
 \docType{class}
 \alias{km-class}
-\alias{plot,km-method}
-\alias{predict,km-method}
+%%\alias{plot,km-method}
+%%\alias{predict,km-method}
 \alias{show,km-method}
 \alias{simulate,km-method}
 

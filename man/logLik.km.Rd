@@ -1,12 +1,15 @@
 \name{logLik.km}
+% \alias{logLik.km}
+\alias{logLik}
 \alias{logLik.km}
+\alias{logLik,km-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ log-likelihood of a km object }
 \description{
 Returns the log-likelihood value of a km object.
 }
 \usage{
-logLik.km(object, ...)
+\S4method{logLik}{km}(object, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

@@ -7,7 +7,7 @@ kmData <- function(formula, data, inputnames=NULL, ...) {
   if (attr(tt, "response") == 0) {
     stop("the response must be provided in formula")
   } else {
-    yname <- all.vars(f, max=1)
+    yname <- all.vars(f, max.names=1)
     datanames <- names(data)
     if (!(yname %in% datanames)) { 
       stop("the response name (left hand side of the formula) must belong to the variable names specified in 'data'")

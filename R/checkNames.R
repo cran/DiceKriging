@@ -17,7 +17,7 @@ checkNames <- function(X1, X2, X1.name="X1", X2.name="X2") {
   
   nm2 <- unique(colnames(X2))
   if (sum(nchar(nm2))==0) {
-    #warning(paste(X2.name, "is not named. I consider that the columns of", X1.name, "and", X2.name, "correspond to the same variables and in the same order."))
+    warning(paste(X2.name, "not named:", X2.name, "'s variables are inherited from", X1.name))
     colnames(X2) <- colnames(X1)
   } else {
     if (length(nm2)<d) stop(paste("not enough names (ties?) found in", X2.name))

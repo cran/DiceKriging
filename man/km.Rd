@@ -126,19 +126,19 @@ par(mfrow=c(1,1))
 n <- 6; d <- 1
 x <- seq(from=0, to=10, length=n)
 y <- sin(x)
-x.pred <- seq(0,10, length=100)
+t <- seq(0,10, length=100)
 
 # one should add a small nugget effect, to avoid numerical problems
 epsilon <- 1e-3
-model <- km(formula<- ~1, design=data.frame(X=x), response=data.frame(y=y), 
+model <- km(formula<- ~1, design=data.frame(x=x), response=data.frame(y=y), 
             covtype="gauss", penalty=list(fun="SCAD", value=3), nugget=epsilon)
 
-p <- predict(model, x.pred, "UK")
+p <- predict(model, data.frame(x=t), "UK")
 
-plot(x.pred, p$mean, type="l", xlab="x", ylab="y", 
+plot(t, p$mean, type="l", xlab="x", ylab="y", 
                      main="Prediction via Penalized Kriging")
 points(x, y, col="red", pch=19)
-lines(x.pred, sin(x.pred), lty=2, col="blue")
+lines(t, sin(t), lty=2, col="blue")
 legend(0, -0.5, legend=c("Sine Curve", "Sample", "Fitted Curve"), 
        pch=c(-1,19,-1), lty=c(2,-1,1), col=c("blue","red","black"))
 
@@ -166,7 +166,7 @@ model <- km(~x, design=data.frame(x=x), response=data.frame(y=y),
 #         and linear trend t(x) = -1 + 2x
 
 t <- seq(from=0, to=1, by=0.005)
-p <- predict(model, newdata=t, type="SK")
+p <- predict(model, newdata=data.frame(x=t), type="SK")
 # beware that type = "SK" for known parameters (default is "UK")
 
 plot(t, p$mean, type="l", ylim=c(-7,7), xlab="x", ylab="y")
@@ -186,7 +186,7 @@ return((sin(10*x)/(1+x)+2*cos(5*x)*x^3+0.841)/1.6)
 
 level <- 0.5; epsilon <- 0.1
 theta <- 1/sqrt(30); p <- 2; n <- 10
-x <- seq(0,1, length=n);
+x <- seq(0,1, length=n)
 
 # Heteregeneous noise variances: number of Monte Carlo evaluation among 
 #                                a total budget of 1000 stochastic simulations
@@ -202,8 +202,8 @@ model <- km(y~1, design=data.frame(x=x), response=data.frame(y=y),
             noise.var=noise.var)
 
 # prediction
-t <- seq(0,1,by=0.01)
-p <- predict.km(model, newdata=t, type="SK")
+t <- seq(0, 1, by=0.01)
+p <- predict.km(model, newdata=data.frame(x=t), type="SK")
 lower <- p$lower95; upper <- p$upper95
 
 # graphics
@@ -213,9 +213,9 @@ plot(t, p$mean, type="l", ylim=c(1.1*min(c(lower,y)) , 1.1*max(c(upper,y))),
 polygon(c(t,rev(t)), c(lower, rev(upper)), col=gray(0.9), border = gray(0.9))
 lines(t, p$mean, type="l", ylim=c(min(lower) ,max(upper)), xlab="x", ylab="y",
                  col="blue", lwd=1)
-lines(t, lower , col="blue", lty=4, lwd=1.7)
-lines(t, upper , col="blue", lty=4, lwd=1.7)
-lines(t,fundet(t),col="black",lwd=2)
+lines(t, lower, col="blue", lty=4, lwd=1.7)
+lines(t, upper, col="blue", lty=4, lwd=1.7)
+lines(t, fundet(t), col="black", lwd=2)
 points(x, y, pch=8,col="blue")
 text(x, y, labels=MC_numbers, pos=3)
 
@@ -307,14 +307,13 @@ eta <- list(c(15, 2, 0.5))
 m <- km(design=doe, response=resp, scaling=TRUE, gr=TRUE, 
 knots=knots, covtype="matern5_2",  coef.var=1, coef.trend=0)
 
-p <- predict(m, t, "UK")$mean
-s <- predict(m, t, "UK")$sd
+p <- predict(m, data.frame(x=t), "UK")
 
-plot(t,f,type="l", ylim=c(-1,0.6), lwd=2)
+plot(t, f, type="l", ylim=c(-1,0.6), lwd=2)
 
-lines(t,p,col="blue", lty=2, lwd=2)
-lines(t,p + 2*s,col="blue")
-lines(t,p - 2*s,col="blue")
+lines(t, p$mean, col="blue", lty=2, lwd=2)
+lines(t, p$mean + 2*p$sd, col="blue")
+lines(t, p$mean - 2*p$sd,col="blue")
 
 abline(v=knots[[1]], lty=2, col="green")
 }

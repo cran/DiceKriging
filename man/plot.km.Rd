@@ -2,7 +2,9 @@
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 
+\alias{plot}
 \alias{plot.km}
+\alias{plot,km-method}
 
 \title{Diagnostic plot for the validation of a km object}
 
@@ -10,11 +12,12 @@
 Three plots are currently available, based on the \code{leaveOneOut.km} results: one plot of fitted values against response values, one plot of standardized residuals, and one qqplot of standardized residuals.
 }
 \usage{
-plot.km(x, kriging.type="UK", ...)
+  \S4method{plot}{km}(x, y=NULL, kriging.type="UK", ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ an object of class "km".  }
+  \item{y}{ not used.  }
   \item{kriging.type}{ an optional character string corresponding to the kriging family, to be chosen between simple kriging ("SK") or universal kriging ("UK"). At this stage, only "UK" is available.}
   \item{...}{ no other argument for this method.}
 }
@@ -62,6 +65,6 @@ branin.resp <- data.frame(branin(fact.design)); names(branin.resp) <- "y"
 # kriging model 1 : gaussian covariance structure, no trend, 
 #                   no nugget effect
 m1 <- km(~1, design=fact.design, response=branin.resp, covtype="gauss")
-plot(m1)	   # or plot.km(m1)
+plot(m1)	   
 }
 
