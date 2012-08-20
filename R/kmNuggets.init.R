@@ -75,7 +75,7 @@ function(model) {
 	var.init <- parinit[lp]
 	parinit <- parinit[1:(lp-1)]
    	   	
-   	model@covariance <- vect2covparam(parinit, model@covariance)
+   	model@covariance <- vect2covparam(model@covariance, parinit)
 	model@covariance@sd2 <- var.init
 	
 	model@lower <- c(lower, varinit.lower)

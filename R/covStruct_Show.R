@@ -172,4 +172,19 @@ setMethod("show", "covScaling",
 	    }
 )
 
+setMethod("show", "covUser", 
+          function(object){
+            cat("\n")
+            cat("Covar. type  : user type \n")                    
+            print(object@kernel)
+            
+            if (object@nugget.flag) {
+              cat("\nNugget effect :", object@nugget)
+              cat("\n\n")
+            }
+          }
+)
+
+
+
 

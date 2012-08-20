@@ -8,6 +8,8 @@
 \alias{covMatrix,covTensorProduct-method}
 \alias{covMatrixDerivative,covTensorProduct-method}
 \alias{covParametersBounds,covTensorProduct-method}
+\alias{covparam2vect,covTensorProduct-method}
+\alias{vect2covparam,covTensorProduct-method}
 \alias{covVector.dx,covTensorProduct-method}
 \alias{inputnames,covTensorProduct-method}
 %\alias{inputnames<-,covTensorProduct,character-method}
@@ -16,8 +18,6 @@
 \alias{nuggetflag,covTensorProduct-method}
 \alias{nuggetvalue,covTensorProduct-method}
 \alias{nuggetvalue<-,covTensorProduct,numeric-method}
-\alias{slice,covTensorProduct-method}
-\alias{slice,covTensorProduct,numeric-method}
 \alias{summary,covTensorProduct-method}
 
 
@@ -29,7 +29,9 @@
   S4 class of tensor-product (or separable) covariances.}
 
 \value{
-\item{covTensorProduct}{separable covariances depending on 1 set of parameters, such as Gaussian, exponential, Matern with fixed nu... or on 2 sets of parameters, such as power-exponential.}
+\item{covTensorProduct}{separable covariances depending on 1 set of
+  parameters, such as Gaussian, exponential, Matern with fixed nu... or
+  on 2 sets of parameters, such as power-exponential.}
 }
 
 \section{Objects from the Class}{
@@ -75,7 +77,7 @@ Power-exponential \tab \code{ k(x,y) = exp(-(h/theta)^p) } \cr
 
 \section{Methods}{
   \describe{
-    \item{show}{\code{signature(x = "covTensorProduct")} Print covariance function. See \code{\link{show.km}}. }
+    \item{show}{\code{signature(x = "covTensorProduct")} Print covariance function. See \code{\link{show,km-method}}. }
     \item{coef}{\code{signature(x = "covTensorProduct")} Get the coefficients of the covariance function. }
     }
 }

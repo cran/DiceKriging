@@ -6,11 +6,11 @@
 \title{ Auxiliary function }
 \description{  Gather the covariance parameters in a single vector. This is useful in the estimation step. Not for direct use.}
 \usage{
-covparam2vect(covStruct)
+covparam2vect(object)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-   \item{covStruct}{ an object of class covTensorProduct. See \code{\link{covTensorProduct-class}}}
+   \item{object}{an object specifying the covariance structure.}
 }
 
 \value{ A vector containing the covariance parameters. }

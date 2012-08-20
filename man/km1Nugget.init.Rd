@@ -31,7 +31,7 @@ km1Nugget.init(model)
 
 \author{ O. Roustant, David Ginsbourger, Ecole des Mines de St-Etienne. }
 
-\seealso{ \code{\link{km}}, \code{\link{km1Nugget}} }
+\seealso{ \code{\link{km}}, \code{\link{kmEstimate}} }
 
 \keyword{models}
 \keyword{htest}

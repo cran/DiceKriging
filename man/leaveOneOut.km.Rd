@@ -39,7 +39,7 @@ M. Schonlau (1997), \emph{Computer experiments and global optimization}, Ph.D. t
 
 \author{ O. Roustant, D. Ginsbourger, Ecole des Mines de St-Etienne. }
 
-\seealso{ \code{\link{predict.km}},  \code{\link{plot.km}} }
+\seealso{ \code{\link{predict,km-method}},  \code{\link{plot,km-method}} }
 
 \keyword{models}
 

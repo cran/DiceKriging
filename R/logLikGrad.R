@@ -6,7 +6,7 @@ function(param, model, envir) {
 		toget <- matrix(c("R","T","z","sigma2.hat"),1,4)
 		apply(toget, 2, get, envir=envir)
 
-		model@covariance <- vect2covparam(param, model@covariance)
+		model@covariance <- vect2covparam(model@covariance, param)
 		model@covariance@sd2 <- 1		# to get the correlation matrix
 	
 		nparam <- length(param)
@@ -41,7 +41,7 @@ function(param, model, envir) {
 	
 		nparam <- length(param)
 	
-		model@covariance <- vect2covparam(param[1:(nparam-1)], model@covariance)
+		model@covariance <- vect2covparam(model@covariance, param[1:(nparam-1)])
 		model@covariance@sd2 <- sigma2 <- param[nparam]
 		
 		logLik.derivative <- matrix(0,nparam,1)
@@ -85,7 +85,7 @@ function(param, model, envir) {
 		
 		nparam <- length(param)
 	
-		model@covariance <- vect2covparam(param[1:(nparam-1)], model@covariance)
+		model@covariance <- vect2covparam(model@covariance, param[1:(nparam-1)])
 		alpha <- param[nparam]
 		model@covariance@sd2 <- 1  #sigma2 <- param[nparam-1]
 		model@covariance@nugget <- 0  #param[nparam]

@@ -1,5 +1,5 @@
-\name{logLik.km}
-% \alias{logLik.km}
+\name{logLik}
+%%\alias{logLik.km}
 \alias{logLik}
 \alias{logLik.km}
 \alias{logLik,km-method}

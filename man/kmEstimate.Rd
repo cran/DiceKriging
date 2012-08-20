@@ -1,13 +1,13 @@
-\name{kmNoNugget}
-\alias{kmNoNugget}
+\name{kmEstimate}
+\alias{kmEstimate}
 %- Also NEED an '\alias' for EACH other topic documented here.
 
 \title{ Fitting Kriging Models }
 \description{
-  \code{kmNoNugget} is used to fit kriging models when there is no nugget effect. This function should not be called directly, due to the environments defined in \code{km} to avoid computing twice \code{nxn} matrices. Call \code{km} instead.
+  \code{kmEstimate} is used to fit kriging models. This function should not be called directly, due to the environments defined in \code{km} to avoid computing twice \code{nxn} matrices. Call \code{km} instead.
 }
 \usage{
-kmNoNugget(model, envir)
+kmEstimate(model, envir)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -25,7 +25,7 @@ kmNoNugget(model, envir)
                       \bold{27}, 1-7. }
 \author{ O. Roustant, D. Ginsbourger, Ecole des Mines de St-Etienne. }
 
-\seealso{ \code{\link{kmNoNugget.init}}, \code{\link{km}}, \code{\link{kmNuggets}}, \code{\link{km1Nugget}}  }
+\seealso{ \code{\link{kmNoNugget.init}}, \code{\link{km}} }
 
 \keyword{models}
 \keyword{htest}

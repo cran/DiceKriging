@@ -27,7 +27,7 @@ The matrix \code{X2}, with columns possibly permuted. See details.
 \author{O. Roustant}
 
 \seealso{
-\code{\link{predict.km}}, \code{\link{simulate.km}}
+\code{\link{predict,km-method}}, \code{\link{simulate,km-method}}
 }
 
 \examples{

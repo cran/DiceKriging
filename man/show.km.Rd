@@ -1,5 +1,5 @@
-\name{show.km}
-\alias{show.km}
+\name{show}
+\alias{show,km-method}
 
 \title{ Print values of a km object}
 \description{
@@ -7,7 +7,7 @@
 }
 
 \usage{
-   \method{show}{km}(object)
+   \S4method{show}{km}(object)
 }
 
 \arguments{

@@ -32,7 +32,7 @@ J.-S. Park and J. Baek (2001), Efficient computation of maximum likelihood estim
 \author{ O. Roustant, D. Ginsbourger, Ecole des Mines de St-Etienne}
 
 
-\seealso{ \code{\link{logLik.km}}, \code{\link{km}}, \code{\link{logLikGrad}} }
+\seealso{ \code{\link{logLik,km-method}}, \code{\link{km}}, \code{\link{logLikGrad}} }
 
 \keyword{models}
 \keyword{htest}

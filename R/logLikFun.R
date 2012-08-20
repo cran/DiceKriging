@@ -3,7 +3,7 @@ function(param, model, envir=NULL) {
 		
 	if (identical(model@case, "NoNugget")) {
 		
-		model@covariance <- vect2covparam(param, model@covariance)
+		model@covariance <- vect2covparam(model@covariance, param)
 		model@covariance@sd2 <- 1		# to get the correlation matrix
 		
 		aux <- covMatrix(model@covariance, model@X)
@@ -35,7 +35,7 @@ function(param, model, envir=NULL) {
 		
 		nparam <- length(param)
 		
-		model@covariance <- vect2covparam(param[1:(nparam-1)], model@covariance)
+		model@covariance <- vect2covparam(model@covariance, param[1:(nparam-1)])
 		model@covariance@sd2 <- param[nparam]
 		
 		aux <- covMatrix(model@covariance, model@X, noise.var=model@noise.var)
@@ -66,7 +66,7 @@ function(param, model, envir=NULL) {
 	
 		nparam <- length(param)
 			
-		model@covariance <- vect2covparam(param[1:(nparam-1)], model@covariance)
+		model@covariance <- vect2covparam(model@covariance, param[1:(nparam-1)])
 		model@covariance@sd2 <- 1
 		model@covariance@nugget <- 0
 		alpha <- param[nparam]

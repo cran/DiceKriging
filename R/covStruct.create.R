@@ -1,6 +1,11 @@
 `covStruct.create` <- 
-function(covtype, d, known.covparam, var.names, coef.cov=NULL, coef.var=NULL, nugget=NULL, nugget.estim=FALSE, nugget.flag=FALSE, iso=FALSE, scaling=FALSE, knots=NULL) {
+function(covtype, d, known.covparam, var.names, coef.cov=NULL, coef.var=NULL, nugget=NULL, nugget.estim=FALSE, nugget.flag=FALSE, iso=FALSE, scaling=FALSE, knots=NULL, kernel=NULL) {
 	
+  if( covtype=="covUser" ){
+    covStruct <- new("covUser", kernel=kernel, nugget.flag=length(nugget)>0, nugget=as.double(nugget))
+	  return(covStruct)
+  }
+  
   if (scaling & iso) {
     iso <- FALSE
     warning("At this stage no isotropic version is available, regular scaling is applied.")
@@ -41,7 +46,7 @@ function(covtype, d, known.covparam, var.names, coef.cov=NULL, coef.var=NULL, nu
 			covStruct@shape.names <- "p"
 		}
 
-		if (length(coef.cov)>0) covStruct <- vect2covparam(coef.cov, covStruct)
+		if (length(coef.cov)>0) covStruct <- vect2covparam(covStruct, coef.cov)
 
 	} else if (classType=="covAffineScaling") {
    	   	

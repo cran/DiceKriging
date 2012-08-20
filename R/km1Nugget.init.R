@@ -91,7 +91,7 @@ function(model) {
 	#var.init <- parinit[lp-1]
 	parinit <- parinit[1:(lp-1)]
    	 
-	model@covariance <- vect2covparam(parinit, model@covariance)   
+	model@covariance <- vect2covparam(model@covariance, parinit)   
 	#model@covariance@sd2 <- var.init
 	#model@covariance@nugget <- nugget.init
 	

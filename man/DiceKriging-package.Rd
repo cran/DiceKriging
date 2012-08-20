@@ -12,13 +12,13 @@ Estimation, validation and prediction of kriging models.
 \tabular{ll}{
 Package: \tab DiceKriging\cr
 Type: \tab Package\cr
-Version: \tab 1.3.3\cr
-Date: \tab 2012-06-01\cr
+Version: \tab 1.4.0\cr
+Date: \tab 2012-08-20\cr
 License: \tab GPL-3 \cr
 }
 }
 
-\author{Olivier Roustant, David Ginsbourger, Yves Deville.
+\author{Olivier Roustant, David Ginsbourger, Yves Deville. Contributor: C. Chevalier.
 
 (maintainer: Olivier Roustant \email{roustant@emse.fr})
 

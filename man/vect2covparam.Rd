@@ -7,16 +7,16 @@
 \description{  Extract the covariance parameters from a single vector. Not for direct use.}
 
 \usage{
-vect2covparam(param, covStruct)
+vect2covparam(object, param)
 }
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-	\item{param}{ a vector containing the covariance parameters.}
-   \item{covStruct}{ an object of class \code{\link{covTensorProduct-class}}. }
+   \item{object}{an object specifying the covariance structure.}
+   \item{param}{a vector containing the covariance parameters.}
 }
 
-\value{ An object of class covTensorProduct }
+\value{ The updated object.}
 
 \author{ O. Roustant, D. Ginsbourger}
 

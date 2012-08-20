@@ -11,7 +11,8 @@ km(formula=~1, design, response, covtype="matern5_2",
    coef.trend = NULL, coef.cov = NULL, coef.var = NULL,
    nugget = NULL, nugget.estim=FALSE, noise.var=NULL, penalty = NULL, 
    optim.method = "BFGS", lower = NULL, upper = NULL, parinit = NULL, 
-   control = NULL, gr = TRUE, iso=FALSE, scaling=FALSE, knots=NULL)
+   control = NULL, gr = TRUE, 
+   iso=FALSE, scaling=FALSE, knots=NULL, kernel=NULL)
 }
 
 
@@ -20,7 +21,7 @@ km(formula=~1, design, response, covtype="matern5_2",
   \item{formula}{ an optional object of class "formula" specifying the linear trend of the kriging model (see \code{\link{lm}}). This formula should concern only the input variables, and not the output (response). If there is any, it is automatically dropped. In particular, no response transformation is available yet. The default is \code{~1}, which defines a constant trend.}
   \item{design}{ a data frame representing the design of experiments. The ith row contains the values of the d input variables corresponding to the ith evaluation}
   \item{response}{ a vector (or 1-column matrix or data frame) containing the values of the 1-dimensional output given by the objective function at the \code{design} points. }
-  \item{covtype}{ an optional character string specifying the covariance structure to be used, to be chosen between \code{"gauss"}, \code{"matern5_2"}, \code{"matern3_2"}, \code{"exp"} or \code{"powexp"}. See a full description of available covariance kernels in \code{\link{covTensorProduct-class}}. Default is \code{"matern5_2"}. }
+  \item{covtype}{ an optional character string specifying the covariance structure to be used, to be chosen between \code{"gauss"}, \code{"matern5_2"}, \code{"matern3_2"}, \code{"exp"} or \code{"powexp"}. See a full description of available covariance kernels in \code{\link{covTensorProduct-class}}. Default is \code{"matern5_2"}. See also the argument \code{kernel} that allows the user to build its own covariance structure.}
   \item{coef.trend,}{ (see below)}
   \item{coef.cov,}{ (see below)}
   \item{coef.var}{ optional vectors containing the values for the trend, covariance and variance parameters. For estimation, there are 3 cases: if \code{coef.trend}, \code{coef.cov}, \code{coef.var} are provided, no estimation is performed; if \code{coef.trend} is provided but at least one of \code{coef.cov} or \code{coef.var} is missing, both \code{coef.cov} and \code{coef.var} are estimated; if all are missing, all are estimated.}
@@ -32,15 +33,38 @@ km(formula=~1, design, response, covtype="matern5_2",
  \item{lower, }{ (see below) }
   \item{upper}{ optional vectors containing the bounds of the correlation parameters for optimization. The default values are given by \code{\link{covParametersBounds}}. }
    \item{parinit}{ an optional vector containing the initial values for the variables to be optimized over. If no vector is given, an initial point is generated as follows. For method \code{"gen"}, the initial point is generated uniformly inside the hyper-rectangle domain defined by \code{lower} and \code{upper}. For method \code{"BFGS"}, some points (see \code{control} below) are generated uniformly in the domain. Then the best point with respect to the likelihood (or penalized likelihood, see \code{penalty}) criterion is chosen. }
-   \item{control}{ an optional list of control parameters for optimization. To avoid printing information in the command line during optimization progress, indicate \code{trace=FALSE}. For method \code{"BFGS"}, \code{pop.size} is the number of candidate initial points generated before optimization starts (see \code{parinit} above). Default is 20. For method \code{"gen"}, one can control  \code{"pop.size"}  (default : min(20, 4+3*log(nb of variables) ),  \code{"max.generations"} (5),  \code{"wait.generations"} (2) and  \code{"BFGSburnin"} (0) of function  \code{"genoud"} (see \code{\link[rgenoud]{genoud}}). Another tunable paramater is \code{upper.alpha} (1-1e-8) for nugget estimation (see \code{\link{km1Nugget}}). Numbers into brackets are the default values. }
+   \item{control}{ an optional list of control parameters for optimization. See details below.}
    \item{gr}{ an optional boolean indicating whether the analytical gradient should be used. Default is \code{TRUE}.}
    \item{iso}{ an optional boolean that can be used to force a tensor-product covariance structure (see \code{\link{covTensorProduct-class}}) to have a range parameter common to all dimensions. Default is \code{FALSE}. Not used (at this stage) for the power-exponential type.}
    \item{scaling}{ an optional boolean indicating whether a scaling on the covariance structure should be used.}
    \item{knots}{ an optional list of knots for scaling. The j-th element is a vector containing the knots for dimension j. If \code{scaling=TRUE} and knots are not specified, than knots are fixed to 0 and 1 in each dimension (which corresponds to affine scaling for the domain [0,1]^d).}
+   \item{kernel}{ an optional function containing a new covariance structure. At this stage, the parameters must be provided as well, and are not estimated. See an example below.}
 }
 
 \value{
   An object of class \code{km} (see \code{\link{km-class}}).
+}
+
+\details{
+The optimisers are tunable by the user by the argument \code{control}. 
+Most of the control parameters proposed by \code{BFGS} and \code{genoud} can be passed to \code{control} except the ones that must be forced [for the purpose of optimization setting], as indicated in the table below. See \code{\link[stats]{optim}} and  \code{\link[rgenoud]{genoud}} to get more details about them. 
+
+\tabular{ll}{
+BFGS \tab \code{trace}, \code{parscale}, \code{ndeps}, \code{maxit}, \code{abstol}, \code{reltol}, \code{REPORT}, \code{lnm}, \code{factr}, \code{pgtol} \cr
+genoud \tab all parameters EXCEPT: \code{fn, nvars, max, starting.values, Domains, gr, gradient.check, boundary.enforcement, hessian} and \code{optim.method}. \cr 
+}
+
+Notice that the right places to specify the optional starting values and boundaries are in \code{parinit} and \code{lower, upper}, as explained above. Some additional possibilities and initial values are indicated in the table below:
+
+\tabular{ll}{
+\code{trace} \tab Turn it to \code{FALSE} to avoid printing during optimization progress.\cr
+%\code{upper.alpha}: Upper value for 'alpha' in nugget estimation \cr
+\code{pop.size} \tab For method \code{"BFGS"}, it is the number of candidate initial points generated before optimization starts (see \code{parinit} above). Default is 20. For method \code{"gen"}, \code{"pop.size"} is the population size, set by default at min(20, 4+3*log(nb of variables) \cr
+\code{max.generations} \tab Default is 5 \cr
+\code{wait.generations} \tab Default is 2 \cr
+\code{BFGSburnin} \tab Default is 0 \cr
+}
+
 }
 
 \references{ 
@@ -75,7 +99,12 @@ C.E. Rasmussen and C.K.I. Williams (2006), \emph{Gaussian Processes for Machine 
 
 \author{ O. Roustant, D. Ginsbourger, Ecole des Mines de St-Etienne. }
 
-\seealso{ \code{\link{kmData}} for another interface with the data, \code{\link{show.km}}, \code{\link{predict.km}}, \code{\link{plot.km}}. Some programming details and initialization choices can be found in \code{\link{kmNoNugget}}, \code{\link{kmNoNugget.init}}, \code{\link{km1Nugget}}, \code{\link{km1Nugget.init}}, \code{\link{kmNuggets}} and \code{\link{kmNuggets.init}} }
+\seealso{ \code{\link{kmData}} for another interface with the data,
+  \code{\link{show,km-method}},
+  \code{\link{predict,km-method}},
+  \code{\link{plot,km-method}}.
+  Some programming details and initialization choices can be found in \code{\link{kmEstimate}}, \code{\link{kmNoNugget.init}},
+\code{\link{km1Nugget.init}} and \code{\link{kmNuggets.init}} }
 
 \keyword{models}
 \keyword{htest}
@@ -224,7 +253,7 @@ text(x, y, labels=MC_numbers, pos=3)
 # Checking parameter estimation 
 # -----------------------------
 
-d <- 3     		# problem dimension
+d <- 3       	# problem dimension
 n <- 40			# size of the experimental design
 design <- matrix(runif(n*d), n, d)
 
@@ -316,4 +345,36 @@ lines(t, p$mean + 2*p$sd, col="blue")
 lines(t, p$mean - 2*p$sd,col="blue")
 
 abline(v=knots[[1]], lty=2, col="green")
+
+
+# -----------------------------------------------------
+# Kriging with a symmetric kernel: example with covUser
+# -----------------------------------------------------
+
+x <- c(0, 0.15, 0.3, 0.4, 0.5)
+y <- c(0.3, -0.2, 0, 0.5, 0.2)
+
+k <- function(x,y) {
+  theta <- 0.15
+  0.5*exp(-((x-y)/theta)^2) + 0.5*exp(-((1-x-y)/theta)^2)    
 }
+
+muser <- km(design=data.frame(x=x), response=data.frame(y=y), 
+            coef.trend=0, kernel=k)
+
+u <- seq(from=0, to=1, by=0.01)
+puser <- predict(muser, newdata=data.frame(x=u), type="SK")
+
+set.seed(0)
+nsim <- 5
+zuser <- simulate(muser, nsim=nsim, newdata=data.frame(x=u), cond=TRUE, nugget.sim=1e-8)
+par(mfrow=c(1,1))
+matplot(u, t(zuser), type="l", lty=rep("solid", nsim), col=1:5, lwd=1)
+polygon(c(u, rev(u)), c(puser$upper, rev(puser$lower)), col="lightgrey", border=NA)
+lines(u, puser$mean, lwd=5, col="blue", lty="dotted")
+matlines(u, t(zuser), type="l", lty=rep("solid", nsim), col=1:5, lwd=1)
+points(x, y, pch=19, cex=1.5)
+
+}
+
+

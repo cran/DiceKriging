@@ -188,6 +188,8 @@ setMethod("nuggetvalue", signature(x = "covIso"), function(x) x@nugget)
 setMethod("nuggetvalue", signature(x = "covTensorProduct"), function(x) x@nugget)
 setMethod("nuggetvalue", signature(x = "covAffineScaling"), function(x) x@nugget)
 setMethod("nuggetvalue", signature(x = "covScaling"), function(x) x@nugget)
+setMethod("nuggetvalue", signature(x = "covUser"), function(x) x@nugget)
+
 
 setGeneric("nuggetvalue<-",function(x, value){ standardGeneric("nuggetvalue<-") })
 
@@ -207,6 +209,7 @@ setReplaceMethod("nuggetvalue", signature(x = "covTensorProduct", value = "numer
 setReplaceMethod("nuggetvalue", signature(x = "covIso", value = "numeric"), nuggetvalueFun)             
 setReplaceMethod("nuggetvalue", signature(x = "covAffineScaling", value = "numeric"), nuggetvalueFun)
 setReplaceMethod("nuggetvalue", signature(x = "covScaling", value = "numeric"), nuggetvalueFun)
+setReplaceMethod("nuggetvalue", signature(x = "covUser", value = "numeric"), nuggetvalueFun)
 
 ##=================================================================
 ## nuggetflag
@@ -221,4 +224,5 @@ setMethod("nuggetflag", signature(x = "covIso"), function(x) x@nugget.flag)
 setMethod("nuggetflag", signature(x = "covTensorProduct"), function(x) x@nugget.flag)
 setMethod("nuggetflag", signature(x = "covAffineScaling"), function(x) x@nugget.flag)
 setMethod("nuggetflag", signature(x = "covScaling"), function(x) x@nugget.flag)
+setMethod("nuggetflag", signature(x = "covUser"), function(x) x@nugget.flag)
 

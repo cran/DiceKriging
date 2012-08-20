@@ -1,18 +1,48 @@
-## DiceKriging 1.3.2. 
+## DiceKriging 1.4.0
+
+## change / DiceKriging 1.3.3
+
+	* addition of the class "covUser", which allows the user to provide its 
+	own covariance kernel (with known parameters).
+	
+	* the user is now able to tune the optimization parameters of 'genoud' and 
+	'BFGS' by the argument 'control' in function 'km'. Compatibility with the 
+	previous 'control' option is ensured.
+	
+	* modification of the 'predict' method: 
+		- Creation of the argument 'bias.correct': Contrarily to 
+		DiceKriging<=1.3.2, the estimated (UK) variance and covariances 
+		are NOT multiplied by n/(n-p) by default.
+		- Creation of the argument 'light.return', that allows to save 
+		memory (expert usage)
+	
+	* merging of 'kmNoNugget', 'km1Nugget' and 'kmNuggets' in a single file, 
+	named 'kmEstimate'
+
+	* the auxiliary functions 'covparam2vect' and 'vect2covparam' are now defined as methods.
+
 
 ## change / DiceKriging 1.3.2
-* the checkNames option is now TRUE by default, and produces a warning instead of an error. The new version will produce an error.
+	
+	* the checkNames option is now TRUE by default, and produces a warning instead of an error. 
+	In the future, it will produce an error.
 
 
-## change / DiceKriging 1.3
+## change / DiceKriging 1.3.
 
-* extension of methods "simulate.km" and "plot.km" to noisy observations.
-* addition of a consistency check between the input names in the design and in newdata. It can be used for prediction and simulation by turning the argument "checkNames" to TRUE. The checking stage is done in the new function "checkNames".  
-* creation of the function "kmData", which allows the user to give the response and the design in a single "data" argument (as for lm). 
-* modifications in the documentation of km (examples), predict.km and simulate.km (section warning + examples).
+	* extension of methods "simulate.km" and "plot.km" to noisy observations.
+	* addition of a consistency check between the input names in the design and in 
+	newdata. It can be used for prediction and simulation by turning the argument 
+	"checkNames" to TRUE. The checking stage is done in the new function "checkNames".  
+	* creation of the function "kmData", which allows the user to give the response and 
+	the design in a single "data" argument (as for lm). 
+	* modifications in the documentation of km (examples), predict.km and simulate.km 
+	(section warning + examples).
 
 
 ## change / DiceKriging 1.2
 
-* addition of the class "covScaling", corresponding to the general case of scaling (varying number of knots per dimension). Implementation of scalingFun and scalingGrad in C
+	* addition of the class "covScaling", corresponding to the general case of scaling 
+	(varying number of knots per dimension). Implementation of scalingFun and scalingGrad 
+	in C
 

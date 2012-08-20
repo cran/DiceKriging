@@ -10,30 +10,26 @@ importFrom("stats", simulate)
 
 
 ## S4
-exportClasses(covTensorProduct, covIso, covScaling, covKernel, km, covAffineScaling)
+exportClasses(covTensorProduct, covIso, covScaling, covKernel, km, covAffineScaling, covUser)
 ## All methods, for own or "foreign" generics:
 exportMethods(show, plot, predict, simulate, covMatrix, covMat1Mat2, 
-covMatrixDerivative, covVector.dx, covParametersBounds, coefficients, summary, inputnames, ninput, kernelname, nuggetvalue, "nuggetvalue<-", nuggetflag)
+covMatrixDerivative, covVector.dx, covParametersBounds, covparam2vect, vect2covparam, coefficients, summary, inputnames, ninput, kernelname, nuggetvalue, "nuggetvalue<-", nuggetflag)
 
 export(branin, 
        camelback, 
        checkNames,
        computeAuxVariables, 
-       covparam2vect,
-       vect2covparam,
        covStruct.create,
        drop.response,
        goldsteinPrice, 
        hartman3, 
        hartman6, 
-       km, 
+       km,
+       kmEstimate,
        kmData,
        km1Nugget.init, 
-       km1Nugget, 
        kmNoNugget.init, 
-       kmNoNugget, 
        kmNuggets.init, 
-       kmNuggets,
        leaveOneOut.km, 
        logLik.km, 
        logLikFun,

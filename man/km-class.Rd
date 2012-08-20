@@ -3,8 +3,8 @@
 \alias{km-class}
 %%\alias{plot,km-method}
 %%\alias{predict,km-method}
-\alias{show,km-method}
-\alias{simulate,km-method}
+%%\alias{show,km-method}
+%%\alias{simulate,km-method}
 
 \title{ Kriging models class }
 
@@ -48,10 +48,10 @@ To create a \code{km} object, use \code{\link{km}}. See also this function for m
 
 \section{Methods}{
   \describe{
-    \item{plot}{\code{signature(x = "km")}: see \code{\link{plot.km}}. }
-    \item{predict}{\code{signature(object = "km")}: see \code{\link{predict.km}}. }
-    \item{show}{\code{signature(object = "km")}: see \code{\link{show.km}}. }
-    \item{simulate}{\code{signature(object = "km")}: see \code{\link{simulate.km}}. }
+    \item{plot}{\code{signature(x = "km")}: see \code{\link{plot,km-method}}. }
+    \item{predict}{\code{signature(object = "km")}: see \code{\link{predict,km-method}}. }
+    \item{show}{\code{signature(object = "km")}: see \code{\link{show,km-method}}. }
+    \item{simulate}{\code{signature(object = "km")}: see \code{\link{simulate,km-method}}. }
 	 }
 }
 

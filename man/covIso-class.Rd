@@ -7,6 +7,8 @@
 \alias{covMatrix,covIso-method}
 \alias{covMatrixDerivative,covIso-method}
 \alias{covParametersBounds,covIso-method}
+\alias{covparam2vect,covIso-method}
+\alias{vect2covparam,covIso-method}
 \alias{covVector.dx,covIso-method}
 \alias{inputnames,covIso-method}
 %\alias{inputnames<-,covIso,character-method}
@@ -16,7 +18,6 @@
 \alias{nuggetvalue,covIso-method}
 \alias{nuggetvalue<-,covIso,numeric-method}
 \alias{show,covIso-method}
-\alias{slice,covIso,numeric-method}
 \alias{summary,covIso-method}
 
 \title{ Class of tensor-product spatial covariances with isotropic range}
@@ -89,6 +90,8 @@ Class \code{"\linkS4class{covKernel}"}, directly.
     \item{covMatrix}{\code{signature(object = "covIso")}: ... }
     \item{covMatrixDerivative}{\code{signature(object = "covIso")}: ... }
     \item{covParametersBounds}{\code{signature(object = "covIso")}: ... }
+    \item{covparam2vect}{\code{signature(object = "covIso")}: ... }  
+    \item{vect2covparam}{\code{signature(object = "covIso")}: ... }  
     \item{covVector.dx}{\code{signature(object = "covIso")}: ... }
     \item{inputnames}{\code{signature(x = "covIso")}: ... }
     \item{kernelname}{\code{signature(x = "covIso")}: ... }
@@ -96,7 +99,6 @@ Class \code{"\linkS4class{covKernel}"}, directly.
     \item{nuggetflag}{\code{signature(x = "covIso")}: ... }
     \item{nuggetvalue}{\code{signature(x = "covIso")}: ... }
     \item{show}{\code{signature(object = "covIso")}: ... }
-    \item{slice}{\code{signature(object = "covIso", index = "numeric")}: ... }
     \item{summary}{\code{signature(object = "covIso")}: ... }
 	 }
 }

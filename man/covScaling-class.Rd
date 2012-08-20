@@ -6,8 +6,9 @@
 \alias{covMatrix,covScaling-method}
 \alias{covMatrixDerivative,covScaling-method}
 \alias{covParametersBounds,covScaling-method}
+\alias{covparam2vect,covScaling-method}
+\alias{vect2covparam,covScaling-method}
 \alias{show,covScaling-method}
-
 \alias{coefficients,covScaling-method}
 \alias{inputnames,covScaling-method}
 \alias{kernelname,covScaling-method}
@@ -15,7 +16,6 @@
 \alias{nuggetflag,covScaling-method}
 \alias{nuggetvalue,covScaling-method}
 \alias{nuggetvalue<-,covScaling,numeric-method}
-%\alias{slice,covScaling,numeric-method}
 \alias{summary,covScaling-method}
 
 \title{Class "covScaling" }
@@ -63,6 +63,8 @@ Class \code{"\linkS4class{covKernel}"}, directly.
     \item{covMatrix}{\code{signature(object = "covScaling")}: ... }
     \item{covMatrixDerivative}{\code{signature(object = "covScaling")}: ... }
     \item{covParametersBounds}{\code{signature(object = "covScaling")}: ... }
+    \item{covparam2vect}{\code{signature(object = "covScaling")}: ... }
+    \item{vect2covparam}{\code{signature(object = "covScaling")}: ... }
     \item{show}{\code{signature(object = "covScaling")}: ... }
     \item{coefficients}{\code{signature(object = "covAffineScaling")}: ... }
     \item{inputnames}{\code{signature(x = "covAffineScaling")}: ... }
@@ -71,7 +73,6 @@ Class \code{"\linkS4class{covKernel}"}, directly.
     \item{nuggetflag}{\code{signature(x = "covAffineScaling")}: ... }
     \item{nuggetvalue}{\code{signature(x = "covAffineScaling")}: ... }
     \item{nuggetvalue<-}{\code{signature(x = "covAffineScaling")}: ... }
-    %\item{slice}{\code{signature(object = "covAffineScaling", index = "numeric")}: ... }
     \item{summary}{\code{signature(object = "covAffineScaling")}: ... }
 }
 }
