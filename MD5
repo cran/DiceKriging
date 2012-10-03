@@ -1,5 +1,5 @@
 85ca18d1ec3efb0863ff3721bfb8ba7d *CHANGELOG
-f1032e97bfae008df0fa8234e2a7f571 *DESCRIPTION
+6fdcb6d686b5dc9f0f49f5b7bec41253 *DESCRIPTION
 e8e2a17b1abc88c19b049f5dc56bc356 *NAMESPACE
 1e766139f208466b094fabdbc100300d *R/SCAD.R
 a890d82e5994119676c75cae73fcbcd9 *R/SCAD.derivative.R
@@ -34,7 +34,8 @@ f426260380d41d80ac2aa32559e1c135 *R/scalingFun.R
 10850ac7fd11d460efbb154392c00b97 *R/scalingGrad.R
 94831d36a285c95ac88aeaf4d9147455 *R/show.km.R
 ba45f491362c1afdc6d546e4346a3cf2 *R/trendMatrix.update.R
-3b619525e0c92228ba9a94ccdff01580 *man/DiceKriging-package.Rd
+dabc1d9c0bae505a957f9491a008d9e0 *inst/CITATION
+8a0ac176165d1dc2fb1af1b8d96bc469 *man/DiceKriging-package.Rd
 8bad82f20ecfed476fef176c65df13e3 *man/SCAD.Rd
 22a4f2e03663d5f1cc699f1e73775d05 *man/SCAD.derivative.Rd
 aa7c143f66730c1422fcc8ff4dbdea53 *man/affineScalingFun.Rd
