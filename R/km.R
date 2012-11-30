@@ -1,12 +1,13 @@
 `km` <-
 function(formula = ~1, design, response, covtype = "matern5_2",  
          coef.trend = NULL, coef.cov = NULL, coef.var = NULL,
-         nugget = NULL, nugget.estim = FALSE, noise.var = NULL, penalty = NULL, 
+         nugget = NULL, nugget.estim = FALSE, noise.var = NULL, 
+         estim.method = "MLE", penalty = NULL, 
          optim.method = "BFGS", lower = NULL, upper = NULL,
          parinit = NULL, control = NULL, gr = TRUE, 
          iso = FALSE, scaling = FALSE, knots = NULL, kernel = NULL) {
 
-  if(!is.null(kernel)){ 
+  if (!is.null(kernel)){ 
     covtype <- "covUser" 
     nugget.estim <- FALSE
   }
@@ -30,13 +31,26 @@ function(formula = ~1, design, response, covtype = "matern5_2",
 	model@noise.flag <- (length(noise.var) != 0)
 	model@noise.var <- as.numeric(noise.var)
   
-	known.param <- ((length(coef.trend) != 0) && (length(coef.cov) != 0) && (length(coef.var) != 0)) || (covtype == "covUser")
+  isTrend <- length(coef.trend) != 0
+  isCov <- length(coef.cov) != 0
+  isVar <- length(coef.var) != 0
   
-  if (known.param) {
+  if ((isTrend && isCov && isVar) || (covtype == "covUser")) {
+    known.param <- "All"
     nugget.estim <- FALSE
+  } else if ((isTrend) && ((!isCov) || (!isVar))) {
+    known.param <- "Trend"
+  } else if ((!isTrend) && isCov && isVar) {
+    known.param <- "CovAndVar"
+    nugget.estim <- FALSE
+  } else {    # In the other cases: All parameters are estimated (at this stage)
+    known.param <- "None"
+    coef.var <- coef.cov <- NULL
+  }
+  
+  if (isCov) {   # curious : why 'known.covparam' is not a boolean ??
     known.covparam <- "All"
   } else {
-    coef.var <- coef.cov <- NULL
     known.covparam <- "None"
   }
   
@@ -47,26 +61,40 @@ function(formula = ~1, design, response, covtype = "matern5_2",
                                        nugget.flag = ((length(nugget) != 0) || nugget.estim),  
                                        iso = iso, scaling = scaling, knots = knots, kernel = kernel)
   
+  model@known.param <- known.param
+  
   ## Now, at least some parameters are unknown
-  if (known.param) {
+  if (known.param=="All") {
     model@trend.coef <- as.numeric(coef.trend)
     model@param.estim <- FALSE
-    model@known.param <- "All"	
     validObject(model)
     model <- computeAuxVariables(model)
     return(model)
-  }		
-  
-  if ((length(coef.trend) != 0) && (length(coef.cov) == 0) && (length(coef.var) == 0)) {
-    model@trend.coef <- as.numeric(coef.trend)
-    model@known.param <- "Trend"
-  } else {
-    model@known.param <- "None"
   }
   
+  if (known.param=="CovAndVar") {
+    model@param.estim <- TRUE
+    validObject(model)
+    model <- computeAuxVariables(model)
+    x <- backsolve(t(model@T), model@y, upper.tri = FALSE)
+    beta <- compute.beta.hat(x=x, M=model@M)
+    z <- compute.z(x=x, M=model@M, beta=beta)
+    model@z <- z
+    model@trend.coef <- beta
+    return(model)
+  }
+  
+  if (known.param=="Trend") {
+    model@trend.coef <- as.numeric(coef.trend)
+  } 
+  
   if (length(penalty) == 0) {
-    model@method <- method <- "MLE"}
-  else {
+    if (is.element(estim.method, c("MLE", "LOO"))) {
+      model@method <- estim.method
+    } else {
+      stop("estim.method must be: 'MLE' or 'LOO'") 
+    }
+  } else {
     if (covtype != "gauss") {
       stop("At this stage, Penalized Maximum Likelihood is coded only for Gaussian covariance")
     }
@@ -79,7 +107,7 @@ function(formula = ~1, design, response, covtype = "matern5_2",
     }
     penalty$fun.derivative <- paste(penalty$fun, ".derivative", sep = "")
     model@penalty <- penalty
-    model@method <- method <- "PMLE"
+    model@method <- "PMLE"
   }
   
   model@param.estim <- TRUE
@@ -125,24 +153,25 @@ function(formula = ~1, design, response, covtype = "matern5_2",
   model@gr <- as.logical(gr)
   
   envir.logLik <- new.env()
-  environment(logLikFun) <- environment(logLikGrad) <- envir.logLik
-  environment(kmNuggets.init) <- envir.logLik
-  environment(kmEstimate) <- environment(kmNoNugget.init) <- envir.logLik
-  environment(km1Nugget.init) <- envir.logLik
   
   validObject(model, complete=TRUE)
   
-  if ((length(noise.var) != 0) || ((length(nugget) != 0) && (nugget.estim == FALSE))) {
+  if ((length(noise.var) != 0) || ((length(nugget) != 0) && (!nugget.estim))) {
     model@case <- "Nuggets"
   }
   
-  if ((length(nugget) == 0) && (nugget.estim == FALSE) && (length(noise.var) == 0)) {
+  if ((length(nugget) == 0) && (!nugget.estim) && (length(noise.var) == 0)) {
     model@case <- "NoNugget"
   } 
   
-  if ((length(noise.var) == 0) && (nugget.estim == TRUE)) {
+  if ((length(noise.var) == 0) && (nugget.estim)) {
     model@case <- "1Nugget"
-  }  
+  } 
+  
+#  knownNugget <- (length(nugget)>0) & (!nugget.estim)
+  if ((model@method=="LOO") & (model@case!="NoNugget")) {
+    stop("leave-One-Out is not available for this model")
+  }
   
   f <- kmEstimate
   
@@ -172,4 +201,3 @@ function(formula = ~1, design, response, covtype = "matern5_2",
   
   return(model)
 }
-

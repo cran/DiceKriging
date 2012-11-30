@@ -1,23 +1,41 @@
+compute.beta.hat <- function(x, M){
+  l <- lm(x ~ M - 1)
+  return(as.numeric(l$coef))
+}
+
+compute.z <- function(x, M, beta=NULL){
+  if (!is.null(beta)) {
+    z <- x - M %*% beta
+  } else {   # in that case, z depends on the MLE estimate of beta (which is useless to compute here)
+    Q <- qr.Q(qr(M))
+    H <- Q %*% t(Q)
+    z <- x - H %*% x
+  }
+  return(as.numeric(z))
+}
+
+compute.sigma2.hat <- function(z){
+  drop(crossprod(z)/length(z))
+}
+
+
 computeAuxVariables <- function(model) {
 	  
 	aux <- covMatrix(model@covariance, X=model@X, noise.var=model@noise.var)
 	C <- aux[[1]]
-	#if (model@covariance@nugget.flag) {
-	#	model@C0 <- aux[[2]] 
-	#}
-		
-   T <- chol(C)
+  T <- chol(C)
 	
-   x <- backsolve(t(T), model@y, upper.tri = FALSE)
-   M <- backsolve(t(T), model@F, upper.tri = FALSE)
-	z <- backsolve(t(T), model@y-model@F%*%as.matrix(model@trend.coef), upper.tri=FALSE) 	
-	#Q <- qr.Q(qr(M))
-   	#H <- Q %*% t(Q)
-   	#z <- x - H %*% x
-	
-	#model@C <- C
-	model@T <- T
-	model@z <- as.numeric(z)
+  x <- backsolve(t(T), model@y, upper.tri = FALSE)
+  M <- backsolve(t(T), model@F, upper.tri = FALSE)
+  model@T <- T
 	model@M <- M
-	return(model)
+	
+  if (length(model@trend.coef)>0){
+    z <- backsolve(t(T), model@y-model@F%*%as.matrix(model@trend.coef), upper.tri=FALSE)   
+    model@z <- as.numeric(z)
+  } else {
+    model@z <- numeric(0)
+  }
+	
+  return(model)
 } 

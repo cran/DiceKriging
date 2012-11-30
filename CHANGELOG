@@ -1,4 +1,21 @@
-## DiceKriging 1.4.0
+## DiceKriging 1.5
+
+## change / DiceKriging 1.4.0 & 1.4.1
+	
+	* update.km : new function/method.
+
+	* Leave-One-Out: implementation of the Dubrule's formula, see 'leaveOneOut.km'.
+	
+	* Estimation: 
+	- in addition to MLE, cross-validation (leave-one-out) is now available when there is no nugget effect nor noisy observations. 
+	- it is now possible to estimate the trend only (the covariance parameters being fixed)
+
+	* Prediction: The trend has been added to the output list. 
+
+	* Implementation of the derivative of the trend f(x) with respect to x, see 'trend.deltax'.
+
+	* Minor: modification of 'computeAuxVariables' to include the case where 'model@trend.coef' has not been computed yet (then only T, M are updated, and z is set to numeric(0)).
+
 
 ## change / DiceKriging 1.3.3
 

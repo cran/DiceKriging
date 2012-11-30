@@ -27,7 +27,7 @@ To create a \code{km} object, use \code{\link{km}}. See also this function for m
     \item{\code{covariance}:}{Object of class \code{"covTensorProduct"}. See \code{\link{covTensorProduct-class}}. }
     \item{\code{noise.flag}:}{Object of class \code{"logical"}. Are the observations noisy? }
     \item{\code{noise.var}:}{Object of class \code{"numeric"}. If the observations are noisy, the vector of noise variances. }
-    \item{\code{known.param}:}{Object of class \code{"character"}. Internal use. One of: \code{"None", "All"} or \code{"Trend"}. }
+    \item{\code{known.param}:}{Object of class \code{"character"}. Internal use. One of: \code{"None", "All", "CovAndVar"} or \code{"Trend"}. }
     \item{\code{case}:}{Object of class \code{"character"}. Internal use. One of: \code{"NoNugget", "1Nugget", "Nuggets"}. }
     \item{\code{param.estim}:}{Object of class \code{"logical"}. \code{TRUE} if at least one parameter is estimated, \code{FALSE} otherwise. }
     \item{\code{method}:}{Object of class \code{"character"}. \code{"MLE"} or \code{"PMLE"} depending on \code{penalty}. }

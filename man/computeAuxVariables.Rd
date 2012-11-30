@@ -18,15 +18,13 @@ computeAuxVariables(model)
 
 \value{
    An updated \code{km} objet, where the changes concern the following items:
-   \item{C0}{ a matrix representing the covariance matrix for the locations specified in \code{model}, when there is no nugget effect nor observation noise.}
-  \item{C}{ a matrix equal to the covariance matrix (including a possible nugget or observation noise).}
-  \item{T}{ a matrix equal to the upper triangular factor of the Choleski decomposition of \code{C}, such that \code{t(T)*T = C}. }
-  \item{z}{ a vector equal to \code{inv(t(T))*(y - F*beta)}, with \code{y}, \code{F}, \code{beta} are respectively the response, the experimental matrix and the trend coefficients specified in \code{model}. }
+  \item{T}{ a matrix equal to the upper triangular factor of the Choleski decomposition of \code{C}, such that \code{t(T)*T = C} (where C is the covariance matrix). }
+  \item{z}{ a vector equal to \code{inv(t(T))*(y - F*beta)}, with \code{y}, \code{F}, \code{beta} are respectively the response, the experimental matrix and the trend coefficients specified in \code{model@trend.coef}. If \code{model@trend.coef} is empty, \code{z} is not computed.}
   \item{M}{ a matrix equal to \code{inv(t(T))*F}. }
   }
   
 \note{
-\code{C0} and \code{C} are computed with \code{covMatrix}. \code{T} is computed with the base function \code{chol}. \code{z} and \code{M} are computed by solving triangular linear systems with \code{backsolve}.
+\code{T} is computed with the base function \code{chol}. \code{z} and \code{M} are computed by solving triangular linear systems with \code{backsolve}. \code{z} is not computed if \code{model@trend.coef} is empty.
 }
 
 \references{ 

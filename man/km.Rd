@@ -3,15 +3,15 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Fit and/or create kriging models }
 \description{
-  \code{km} is used to fit kriging models when parameters are unknown, or to create \code{km} objects otherwise. In both cases, the result is a \code{km} object. If parameters are unknown, they are estimated by Maximum Likelihood. As a beta version, Penalized Maximum Likelihood Estimation is also possible if some penalty is given.
+  \code{km} is used to fit kriging models when parameters are unknown, or to create \code{km} objects otherwise. In both cases, the result is a \code{km} object. If parameters are unknown, they are estimated by Maximum Likelihood. As a beta version, Penalized Maximum Likelihood Estimation is also possible if some penalty is given, or Leave-One-Out for noise-free observations.
 }
 
 \usage{
 km(formula=~1, design, response, covtype="matern5_2",
    coef.trend = NULL, coef.cov = NULL, coef.var = NULL,
-   nugget = NULL, nugget.estim=FALSE, noise.var=NULL, penalty = NULL, 
-   optim.method = "BFGS", lower = NULL, upper = NULL, parinit = NULL, 
-   control = NULL, gr = TRUE, 
+   nugget = NULL, nugget.estim=FALSE, noise.var=NULL, estim.method="MLE",
+   penalty = NULL, optim.method = "BFGS", lower = NULL, upper = NULL, 
+   parinit = NULL, control = NULL, gr = TRUE, 
    iso=FALSE, scaling=FALSE, knots=NULL, kernel=NULL)
 }
 
@@ -24,10 +24,11 @@ km(formula=~1, design, response, covtype="matern5_2",
   \item{covtype}{ an optional character string specifying the covariance structure to be used, to be chosen between \code{"gauss"}, \code{"matern5_2"}, \code{"matern3_2"}, \code{"exp"} or \code{"powexp"}. See a full description of available covariance kernels in \code{\link{covTensorProduct-class}}. Default is \code{"matern5_2"}. See also the argument \code{kernel} that allows the user to build its own covariance structure.}
   \item{coef.trend,}{ (see below)}
   \item{coef.cov,}{ (see below)}
-  \item{coef.var}{ optional vectors containing the values for the trend, covariance and variance parameters. For estimation, there are 3 cases: if \code{coef.trend}, \code{coef.cov}, \code{coef.var} are provided, no estimation is performed; if \code{coef.trend} is provided but at least one of \code{coef.cov} or \code{coef.var} is missing, both \code{coef.cov} and \code{coef.var} are estimated; if all are missing, all are estimated.}
+  \item{coef.var}{ optional vectors containing the values for the trend, covariance and variance parameters. For estimation, 4 cases are implemented: 1. (All unknown) If all are missing, all are estimated. 2. (All known) If all are provided, no estimation is performed; 3. (Known trend) If \code{coef.trend} is provided but at least one of \code{coef.cov} or \code{coef.var} is missing, then BOTH \code{coef.cov} and \code{coef.var} are estimated; 4. (Unknown trend) If \code{coef.cov} and \code{coef.var} are provided but \code{coef.trend} is missing, then \code{coef.trend} is estimated (GLS formula).}
    \item{nugget}{ an optional variance value standing for the homogeneous nugget effect.}
   \item{nugget.estim}{ an optional boolean indicating whether the nugget effect should be estimated. Note that this option does not concern the case of heterogeneous noisy observations (see \code{noise.var} below). If \code{nugget} is given, it is used as an initial value. Default is \code{FALSE}.}
   \item{noise.var}{ for noisy observations : an optional vector containing the noise variance at each observation. This is useful for stochastic simulators. Default is \code{NULL}.}
+  \item{estim.method}{  a character string specifying the method by which unknown parameters are estimated. Default is \code{"MLE"} (Maximum Likelihood). At this stage, a beta version of leave-One-Out estimation (\code{estim.method="LOO"}) is also implemented for noise-free observations.}
   \item{penalty}{ (beta version) an optional list suitable for Penalized Maximum Likelihood Estimation. The list must contain the item \code{fun} indicating the penalty function, and the item \code{value} equal to the value of the penalty parameter. At this stage the only available \code{fun} is \code{"SCAD"}, and \code{covtype} must be \code{"gauss"}. Default is \code{NULL}, corresponding to (un-penalized) Maximum Likelihood Estimation.}
   \item{optim.method}{ an optional character string indicating which optimization method is chosen for the likelihood maximization. \code{"BFGS"} is the \code{optim} quasi-Newton procedure of package \code{stats}, with the method "L-BFGS-B". \code{"gen"} is the \code{genoud} genetic algorithm (using derivatives) from package \code{rgenoud} (>= 5.3.3). }
  \item{lower, }{ (see below) }
@@ -47,7 +48,7 @@ km(formula=~1, design, response, covtype="matern5_2",
 
 \details{
 The optimisers are tunable by the user by the argument \code{control}. 
-Most of the control parameters proposed by \code{BFGS} and \code{genoud} can be passed to \code{control} except the ones that must be forced [for the purpose of optimization setting], as indicated in the table below. See \code{\link[stats]{optim}} and  \code{\link[rgenoud]{genoud}} to get more details about them. 
+Most of the control parameters proposed by \code{BFGS} and \code{genoud} can be passed to \code{control} except the ones that must be forced [for the purpose of optimization setting], as indicated in the table below. See \code{\link[stats]{optim}} and  \code{\link[rgenoud]{genoud}} to get more details about them.
 
 \tabular{ll}{
 BFGS \tab \code{trace}, \code{parscale}, \code{ndeps}, \code{maxit}, \code{abstol}, \code{reltol}, \code{REPORT}, \code{lnm}, \code{factr}, \code{pgtol} \cr

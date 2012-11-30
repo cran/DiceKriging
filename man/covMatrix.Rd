@@ -19,8 +19,8 @@ covMatrix(object, X, noise.var = NULL)
 
 \value{
   a list with the following items :
-  \item{C0}{ a matrix representing the covariance matrix for the locations specified in the X argument, when there is no nugget effect nor observation noise.}
-  \item{C}{ a matrix equal to the covariance matrix (including a possible nugget or observation noise).}
+  \item{C}{ a matrix representing the covariance matrix for the locations specified in the X argument, including a possible nugget effect or observation noise.}
+  \item{vn}{ a vector of length \code{n} (\code{X} size) containing a replication of the nugget effet or the observation noise (so that \code{C-vn} contains the covariance matrix when there is no nugget effect nor observation noise)}
   }
 
 

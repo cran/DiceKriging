@@ -22,7 +22,7 @@ setClass("km",
                         noise.flag = "logical",    ## Are observations noisy ? 
                         noise.var = "numeric",     ## vector of length n
 			## model information
-                        known.param = "character", ## known parameters: "None", "All" or "Trend"
+                        known.param = "character", ## which parameters among trend, cov, var are known? ("None", "All", "Trend", "CovAndVar", etc.)
                         case = "character",        ## "NoNugget" : deterministic observations, no nugget effect
                         ## "1Nugget"  : homogenous nugget effect, to be estimated
                         ## "Nuggets"  : known nugget or (exclusive) noisy observations 
@@ -91,10 +91,11 @@ setMethod("show", "km",
 ##                            P L O T  METHOD
 ##*****************************************************************************
 
-plot.km <- function(x, kriging.type = "UK", ...) {
+plot.km <- function(x, kriging.type = "UK", trend.reestim=FALSE, ...) {
   
   model <- x
-  pred <- leaveOneOut.km(model, kriging.type)
+  pred <- leaveOneOut.km(model, type=kriging.type, 
+                         trend.reestim=trend.reestim)
   y <- as.matrix(model@y)
   yhat <- pred$mean
   sigma <- pred$sd
@@ -127,8 +128,9 @@ if(!isGeneric("plot")) {
 
 setMethod("plot",
           signature(x = "km"), 
-          function(x, y = NULL, kriging.type = "UK", ...) {
-            plot.km(x = x, kriging.type = kriging.type, ...)
+          function(x, y = NULL, kriging.type = "UK", trend.reestim=FALSE, ...) {
+            plot.km(x = x, kriging.type = kriging.type, 
+                           trend.reestim=trend.reestim, ...)
           }
           )
 
@@ -182,6 +184,7 @@ predict.km <- function(object, newdata, type,
   y.predict <- as.numeric(y.predict)
   
   output.list <- list()
+  output.list$trend <- y.predict.trend
   output.list$mean <- y.predict
   
   if (!light.return) {
@@ -356,4 +359,135 @@ setMethod("simulate", "km",
           }
           )
 
+##****************************************************************************
+##			     update  METHOD
+##****************************************************************************
 
+update.km <- function(object,
+                      newX,
+                      newy,
+                      newX.alreadyExist =  FALSE,
+                      cov.reestim = FALSE,
+                      newnoise.var = NULL, kmcontrol = NULL, newF = NULL){
+  
+  if (newX.alreadyExist == FALSE) {
+		
+    object@X <- rbind(object@X, as.matrix(newX))
+    object@y <- rbind(object@y, as.matrix(newy))
+    
+    ## Consistency tests between object@noise.var and newnoise.var
+    if ( (length(object@noise.var) != 0) && (is.null(newnoise.var)) ) {
+      ## noisy initial observations and no noise for new observations
+      if (is.null(nrow(newX))) {Thenewnoise.var=0}
+      else {Thenewnoise.var <- rep(0,nrow(newX))}								
+      object@noise.var <- c(object@noise.var,Thenewnoise.var)
+    }
+    if ((length(object@noise.var) != 0) && (!is.null(newnoise.var))) {
+      ## noisy initial observations and noisy new observations
+      object@noise.var <- c(object@noise.var,newnoise.var)
+    }
+    if ((length(object@noise.var) == 0) && (!is.null(newnoise.var))) {
+      ## noise free initial observations and noisy new observations
+      if (any(newnoise.var!=0)){
+        ##when previous noise are 0 AND all the new noises are 0 we are still noise free
+        noise.var.init <- rep(0,object@n)
+        object@noise.var <- c(noise.var.init,newnoise.var)
+      }
+    }
+    
+    if (cov.reestim) {
+      
+      ## case 1: new points, covariance parameter re-estimation (provided object@param.estim == true)
+      if (object@param.estim) {
+        ## case 1a: here we re-estimate the covariance parameter
+        ## default values for the cov param estimation parameters - when they are not provided
+        if (is.null(kmcontrol$penalty)) kmcontrol$penalty <- object@penalty
+      
+        if (length(object@penalty == 0)) kmcontrol$penalty <- NULL
+        if (is.null(kmcontrol$optim.method)) kmcontrol$optim.method <- object@optim.method 
+        if (is.null(kmcontrol$control)) kmcontrol$control <- object@control
+        
+        ## retire
+        ## if (is.null(kmcontrol$parinit)) kmcontrol$parinit <- covparam2vect(object@covariance)
+        
+        TheCov <- object@covariance
+        
+        if (class(TheCov) == "covTensorProduct") {
+          object <- km(formula = object@trend.formula, design = object@X, response = object@y,
+                      covtype = object@covariance@name, lower = object@lower, upper = object@upper,
+                      noise.var = object@noise.var, penalty = kmcontrol$penalty,
+                      optim.method = kmcontrol$optim.method, control = kmcontrol$control,
+                      gr = object@gr)
+        } else if (class(TheCov) == "covIso") {
+          object <- km(formula = object@trend.formula, design = object@X, response = object@y,
+                      covtype = object@covariance@name, lower = object@lower, upper = object@upper,
+                      noise.var = object@noise.var, penalty = kmcontrol$penalty,
+                      optim.method = kmcontrol$optim.method,
+                      control = kmcontrol$control, gr = object@gr, iso = TRUE)              
+        } else if (class(TheCov)=="covScaling") {
+          knots <- object@covariance@knots
+          object <- km(formula = object@trend.formula, design = object@X, response = object@y,
+                      covtype = object@covariance@name, lower = object@lower, upper = object@upper,
+                      noise.var = object@noise.var, penalty = kmcontrol$penalty,
+                      optim.method = kmcontrol$optim.method,
+                      control = kmcontrol$control, gr = object@gr, scaling = TRUE, knots = knots)  
+        } else {
+          print("Unknown covariance type. Accepted types are \"covTensorProduct\", \"covIso\" and \"covScaling\"")
+          return(0)
+        }
+      } else {
+        ## case 1b: no re-estimation because object@param.estim == FALSE. 
+        ## Keeping the current covariance parameters
+        
+        object@n <- nrow(object@X)
+        if (is.null(newF)) {
+          object@F <- trendMatrix.update(object, Xnew = data.frame(newX))
+        } else object@F <- rbind(object@F, newF)
+        
+        object <- computeAuxVariables(object)
+        
+      }
+    } else {
+      ## case 2: new points, no re-estimation because cov.reestim==FALSE. 
+      ## Keeping the current covariance parameters
+      
+      object@n <- nrow(object@X)
+      if (is.null(newF)) {
+        object@F <- trendMatrix.update(object, Xnew = data.frame(newX))
+      } else object@F <- rbind(object@F, newF)
+      
+      object <- computeAuxVariables(object)
+      
+    }
+  } else {
+    ## case 3: existing points with a modified response, 
+    ## No need to recalculate the Cholesky but the other variables are still needed (z, M) for prediction. 
+    ## No covariance param re-estimation in this case
+    ## we assume that the k new values given modify the k last points of the design object@X
+    
+    if (is.null(nrow(newX))) {
+      numrow <- 1
+    } else numrow <- nrow(newX)
+    
+    for (i in 1:numrow) {
+      object@y[object@n - numrow + i] <- newy[i]
+    }
+    object <- computeAuxVariables_noChol(object)
+  }
+  return(object)
+}
+
+if(!isGeneric("update")) {
+  setGeneric(name = "update",
+             def = function(object, ...) standardGeneric("update")
+             )
+}
+
+setMethod("update", "km", 
+          function(object, newX, newy, newX.alreadyExist =  FALSE, cov.reestim = FALSE,
+                   newnoise.var = NULL, kmcontrol = NULL, newF = NULL, ...) {
+            update.km(object=object, newX = newX, newy = newy, 
+                      newX.alreadyExist = newX.alreadyExist, cov.reestim = cov.reestim,
+                      newnoise.var = newnoise.var, kmcontrol = kmcontrol, newF = newF, ...) 
+          }
+          )

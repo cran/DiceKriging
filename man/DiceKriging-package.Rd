@@ -12,13 +12,13 @@ Estimation, validation and prediction of kriging models.
 \tabular{ll}{
 Package: \tab DiceKriging\cr
 Type: \tab Package\cr
-Version: \tab 1.4.1\cr
-Date: \tab 2012-10-03\cr
+Version: \tab 1.5\cr
+Date: \tab 2012-11-30\cr
 License: \tab GPL-2 | GPL-3 \cr
 }
 }
 
-\author{Olivier Roustant, David Ginsbourger, Yves Deville. Contributor: C. Chevalier.
+\author{Olivier Roustant, David Ginsbourger, Yves Deville. Contributors: C. Chevalier, Y. Richet.
 
 (maintainer: Olivier Roustant \email{roustant@emse.fr})
 
@@ -26,7 +26,11 @@ License: \tab GPL-2 | GPL-3 \cr
 
 \references{
 
+F. Bachoc (+2012), Cross validation and maximum likelihood estimations of hyper-parameters of Gaussian processes with model misspecification. Submitted. \url{http://www.lpma.math.upmc.fr/pageperso/bachoc/CSDA2011.pdf}
+
 N.A.C. Cressie (1993), \emph{Statistics for spatial data}, Wiley series in probability and mathematical statistics.
+
+O. Dubrule (1983), Cross validation of Kriging in a unique neighborhood. \emph{Mathematical Geology}, \bold{15}, 687-699.
 
 D. Ginsbourger (2009), \emph{Multiples metamodeles pour l'approximation et l'optimisation
 de fonctions numeriques multivariables}, Ph.D. thesis, Ecole Nationale Superieure des
@@ -51,7 +55,7 @@ G. Matheron (1963), Principles of geostatistics, \emph{Economic Geology}, \bold{
 
 G. Matheron (1969), Le krigeage universel, \emph{Les Cahiers du Centre de Morphologie Mathematique de Fontainebleau}, \bold{1}.
 
-W.R. Jr. Mebane and J.S. Sekhon, in press (2009), Genetic optimization using derivatives: The rgenoud package for R, \emph{Journal of Statistical Software}.
+W.R. Mebane, Jr., J.S. Sekhon (2011). Genetic Optimization Using Derivatives: The rgenoud Package for R. \emph{Journal of Statistical Software}, \bold{42}(11), 1-26. \url{http://www.jstatsoft.org/v42/i11/}
 
 J.-S. Park and J. Baek (2001), Efficient computation of maximum likelihood estimators in a spatial linear model with power exponential covariogram, \emph{Computer Geosciences}, \bold{27} no. 1, 1-7.
 
@@ -59,8 +63,7 @@ C.E. Rasmussen and C.K.I. Williams (2006), \emph{Gaussian Processes for Machine 
 
 B.D. Ripley (1987), \emph{Stochastic Simulation}, Wiley.
 
-O. Roustant, D. Ginsbourger and Yves Deville (2012), DiceKriging, DiceOptim: Two R Packages for the Analysis of Computer Experiments by Kriging-Based Metamodeling and Optimization, \emph{Journal of Statistical Software}, 
-\bold{51}(1), 1-55, \url{http://www.jstatsoft.org/v51/i01/}.
+O. Roustant, D. Ginsbourger and Yves Deville (2012), DiceKriging, DiceOptim: Two R Packages for the Analysis of Computer Experiments by Kriging-Based Metamodeling and Optimization, \emph{Journal of Statistical Software}, \bold{51}(1), 1-55, \url{http://www.jstatsoft.org/v51/i01/}.
 
 J. Sacks, W.J. Welch, T.J. Mitchell, and H.P. Wynn (1989), Design and analysis of computer experiments, \emph{Statistical Science}, \bold{4}, 409-435.
 

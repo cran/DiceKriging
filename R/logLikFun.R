@@ -1,6 +1,12 @@
 `logLikFun` <-
 function(param, model, envir=NULL) {
-		
+	
+  if (model@known.param=="Trend") {
+    beta <- model@trend.coef
+  } else {
+    beta <- NULL
+  }
+  
 	if (identical(model@case, "NoNugget")) {
 		
 		model@covariance <- vect2covparam(model@covariance, param)
@@ -13,25 +19,18 @@ function(param, model, envir=NULL) {
 		    
    	x <- backsolve(t(T), model@y, upper.tri = FALSE)
    	M <- backsolve(t(T), model@F, upper.tri = FALSE)
-		if (identical(model@known.param, "Trend")) {
-   			z <- x - M %*% model@trend.coef
-   		} else {
-			Q <- qr.Q(qr(M))
-   			H <- Q %*% t(Q)
-   			z <- x - H %*% x
-   		}
-	
-		sigma2.hat <- t(z)%*%(z) / model@n
+		z <- compute.z(x=x, M=M, beta=beta)
+		sigma2.hat <- compute.sigma2.hat(z)
 		logLik <- -0.5*(model@n * log(2*pi*sigma2.hat) + 2*sum(log(diag(T))) + model@n)
 		
 		if (!is.null(envir)) { 
-			assign("T",T, envir=envir) # stocking intermediate variables
-			assign("R",R, envir=envir)
-			assign("z",z, envir=envir)
-			assign("sigma2.hat",sigma2.hat, envir=envir)
+			envir$T <- T
+      envir$R <- R
+      envir$z <- z
+      envir$sigma2.hat <- sigma2.hat
 		}
 		
-	} 	else if (identical(model@case, "Nuggets")) {
+	} else if (identical(model@case, "Nuggets")) {
 		
 		nparam <- length(param)
 		
@@ -41,25 +40,20 @@ function(param, model, envir=NULL) {
 		aux <- covMatrix(model@covariance, model@X, noise.var=model@noise.var)
 	
 		C <- aux[[1]]
-		C0 <- aux[[2]] 
+		vn <- aux[[2]]
 
-    	T <- chol(C)
-    	x <- backsolve(t(T), model@y, upper.tri = FALSE)
-    	M <- backsolve(t(T), model@F, upper.tri = FALSE)
-    	if (identical(model@known.param, "Trend")) {
-   			z <- x - M %*% model@trend.coef
-   		} else {
-    		Q <- qr.Q(qr(M))
-    		H <- Q %*% t(Q)
-    		z <- x - H %*% x
-		}
-		logLik <-  -0.5*(model@n * log(2*pi) + 2*sum(log(diag(T))) + t(z)%*%z)     
+    T <- chol(C)
+    x <- backsolve(t(T), model@y, upper.tri = FALSE)
+    M <- backsolve(t(T), model@F, upper.tri = FALSE)
+		z <- compute.z(x=x, M=M, beta=beta)
+		
+    logLik <-  -0.5*(model@n * log(2*pi) + 2*sum(log(diag(T))) + t(z)%*%z)     
 	
 		if (!is.null(envir)) {
-			assign("T",T, envir=envir)	# stocking intermediate variables
-			assign("C",C, envir=envir)
-			assign("C0",C0, envir=envir)
-			assign("z",z, envir=envir)
+      envir$T <- T
+      envir$C <- C
+      envir$vn <- vn
+      envir$z <- z
 		}
 				
 	} else if (identical(model@case, "1Nugget")) {
@@ -72,29 +66,22 @@ function(param, model, envir=NULL) {
 		alpha <- param[nparam]
 		
 		aux <- covMatrix(model@covariance, model@X)
-		R0 <- aux[[2]]
+		R0 <- aux[[1]]-diag(aux[[2]])
 		R <- alpha*R0 + (1-alpha)*diag(model@n)
-		#C0 <- aux[[2]] 
-
-   		T <- chol(R)
-   		x <- backsolve(t(T), model@y, upper.tri = FALSE)
-   		M <- backsolve(t(T), model@F, upper.tri = FALSE)
-   		if (identical(model@known.param, "Trend")) {
-   			z <- x - M %*% model@trend.coef
-   		} else {
-	   		Q <- qr.Q(qr(M))
-   			H <- Q %*% t(Q)
-   			z <- x - H %*% x
-		}
-		v <- t(z)%*%(z) / model@n
-
+    
+    T <- chol(R)
+   	x <- backsolve(t(T), model@y, upper.tri = FALSE)
+   	M <- backsolve(t(T), model@F, upper.tri = FALSE)
+		z <- compute.z(x=x, M=M, beta=beta)
+		v <- compute.sigma2.hat(z)
+		
 		logLik <- -0.5*(model@n * log(2*pi*v) + 2*sum(log(diag(T))) + model@n)
 	
 		if (!is.null(envir)) {
-			assign("T",T, envir=envir)	# stocking intermediate variables
-			assign("R0",R0, envir=envir)
-			assign("v",v, envir=envir)
-			assign("z",z, envir=envir)
+		  envir$T <- T
+		  envir$R0 <- R0
+		  envir$v <- v
+		  envir$z <- z
 		}	
 		
 	}
@@ -109,4 +96,3 @@ function(param, model, envir=NULL) {
 	return(logLik)
 
 }
-

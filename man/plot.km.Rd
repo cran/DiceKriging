@@ -10,21 +10,22 @@
 Three plots are currently available, based on the \code{leaveOneOut.km} results: one plot of fitted values against response values, one plot of standardized residuals, and one qqplot of standardized residuals.
 }
 \usage{
-\S4method{plot}{km}(x, y = NULL, kriging.type = "UK", ...)
+\S4method{plot}{km}(x, y = NULL, kriging.type = "UK", trend.reestim=FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{ an object of class "km".}
+  \item{x}{ an object of class "km" without noisy observations.}
   \item{y}{ not used.  }
-  \item{kriging.type}{ an optional character string corresponding to the kriging family, to be chosen between simple kriging ("SK") or universal kriging ("UK"). At this stage, only "UK" is available.}
+  \item{kriging.type}{ an optional character string corresponding to the kriging family, to be chosen between simple kriging ("SK") or universal kriging ("UK").}
+  \item{trend.reestim}{ should the trend be reestimated when removing an observation? Default to FALSE.}
   \item{...}{ no other argument for this method.}
 }
 
 \details{
-The standardized residuals are defined by \code{( y(xi) - yhat_{-i}(xi) ) / sigmahat_{-i}(xi)}, where \code{y(xi)} is the response at the point \code{xi}, \code{yhat_{-i}(xi)} is the fitted value when removing the observation \code{xi} (see \code{\link{leaveOneOut.km}}), and \code{sigmahat_{-i}(xi)} is the corresponding kriging standard deviation. }
+The diagnostic plot has not been implemented yet for noisy observations. The standardized residuals are defined by \code{( y(xi) - yhat_{-i}(xi) ) / sigmahat_{-i}(xi)}, where \code{y(xi)} is the response at the point \code{xi}, \code{yhat_{-i}(xi)} is the fitted value when removing the observation \code{xi} (see \code{\link{leaveOneOut.km}}), and \code{sigmahat_{-i}(xi)} is the corresponding kriging standard deviation. }
 
 \section{Warning}{
- Kriging parameters are not re-estimated when removing one observation. With few points, the re-estimated values can be far from those obtained with the entire learning set.
+ Kriging parameters are not re-estimated when removing one observation. With few points, the re-estimated values can be far from those obtained with the entire learning set. One option is to reestimate the trend coefficients, by setting \code{trend.reestim=TRUE}.
 }
 
 \value{ A list composed of:
@@ -62,7 +63,9 @@ branin.resp <- data.frame(branin(fact.design)); names(branin.resp) <- "y"
 
 # kriging model 1 : gaussian covariance structure, no trend, 
 #                   no nugget effect
-m1 <- km(~1, design=fact.design, response=branin.resp, covtype="gauss")
-plot(m1)	   # or plot.km(m1)
+m1 <- km(~.^2, design=fact.design, response=branin.resp, covtype="gauss")
+plot(m1)  # LOO without parameter reestimation
+plot(m1, trend.reestim=TRUE)  # LOO with trend parameters reestimation 
+                              # (gives nearly the same result here)
 }
 

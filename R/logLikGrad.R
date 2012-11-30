@@ -1,18 +1,20 @@
 `logLikGrad` <-
 function(param, model, envir) {
-	
-	if (identical(model@case, "NoNugget")) {
-		
-		toget <- matrix(c("R","T","z","sigma2.hat"),1,4)
-		apply(toget, 2, get, envir=envir)
 
-		model@covariance <- vect2covparam(model@covariance, param)
+  if (identical(model@case, "NoNugget")) {
+    
+    R <- envir$R
+    T <- envir$T
+    z <- envir$z
+    sigma2.hat <- envir$sigma2.hat
+     
+    model@covariance <- vect2covparam(model@covariance, param)
 		model@covariance@sd2 <- 1		# to get the correlation matrix
 	
 		nparam <- length(param)
 		
 		logLik.derivative <- matrix(0,nparam,1)
-									
+		
 		x <- backsolve(T,z)			# compute x := T^(-1)*z
 		Rinv <- chol2inv(T)			# compute inv(R) by inverting T
 			
@@ -46,9 +48,11 @@ function(param, model, envir) {
 		
 		logLik.derivative <- matrix(0,nparam,1)
 							
-		toget <- matrix(c("C","T","C0","z"),1,4)
-		apply(toget, 2, get, envir=envir)
-	
+		C <- envir$C
+    T <- envir$T 
+    vn <- envir$vn
+    z <- envir$z
+    
 		x <- backsolve(T,z)			# x := T^(-1)*z
 		Cinv <- chol2inv(T)			# Invert R from given T
 	
@@ -68,7 +72,7 @@ function(param, model, envir) {
 			logLik.derivative[k] <- term1 + term2
 		}
 		# partial derivative with respect to sigma^2
-		dCdsigma2 <- C0/sigma2
+		dCdsigma2 <- (C-diag(vn))/sigma2   # C0 = C - diag(vn)
 		term1 <- -t(x)%*%dCdsigma2%*%x 
 		term2 <- sum(Cinv*dCdsigma2)       # economic computation of trace(Cinv%*%C0)
 		logLik.derivative[nparam] <- -0.5*(term1 + term2) #/sigma2
@@ -92,9 +96,11 @@ function(param, model, envir) {
 	
 		logLik.derivative <- matrix(0,nparam,1)
 							
-		toget <- matrix(c("T","R0","v","z"),1,4)
-		apply(toget, 2, get, envir=envir)
-	
+		T <- envir$T
+		R0 <- envir$R0
+		v <- envir$v
+    z <- envir$z
+    
 		x <- backsolve(T,z)			# x := T^(-1)*z
 		Cinv <- chol2inv(T)			# Invert R from given T
 	
