@@ -1,4 +1,11 @@
-## DiceKriging 1.5
+## DiceKriging 1.5.1
+
+## change / DiceKriging 1.5
+
+	* update method: It is now possible to reestimate the trend and/or the nugget effect when adding new points
+
+	* checkNames.R: correction of a bug in function checkNames (mistake in columns permutations) + addtion of a test function
+
 
 ## change / DiceKriging 1.4.0 & 1.4.1
 	

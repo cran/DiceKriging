@@ -128,7 +128,8 @@ if(!isGeneric("plot")) {
 
 setMethod("plot",
           signature(x = "km"), 
-          function(x, y = NULL, kriging.type = "UK", trend.reestim=FALSE, ...) {
+          function(x, y, kriging.type = "UK", trend.reestim=FALSE, ...) {
+            if (!missing(y)) warning("Argument y is ignored (not used in this plot method)")
             plot.km(x = x, kriging.type = kriging.type, 
                            trend.reestim=trend.reestim, ...)
           }
@@ -367,76 +368,89 @@ update.km <- function(object,
                       newX,
                       newy,
                       newX.alreadyExist =  FALSE,
-                      cov.reestim = FALSE,
+                      cov.reestim = TRUE,trend.reestim = TRUE,nugget.reestim=FALSE,
                       newnoise.var = NULL, kmcontrol = NULL, newF = NULL){
   
   if (newX.alreadyExist == FALSE) {
-		
+    
     object@X <- rbind(object@X, as.matrix(newX))
     object@y <- rbind(object@y, as.matrix(newy))
     
-    ## Consistency tests between object@noise.var and newnoise.var
+    ######## Consistency tests between object@noise.var and newnoise.var ########
+    
     if ( (length(object@noise.var) != 0) && (is.null(newnoise.var)) ) {
-      ## noisy initial observations and no noise for new observations
-      if (is.null(nrow(newX))) {Thenewnoise.var=0}
-      else {Thenewnoise.var <- rep(0,nrow(newX))}								
-      object@noise.var <- c(object@noise.var,Thenewnoise.var)
+      ## noisy initial observations and noise free new observations
+      if (is.null(nrow(newX))) {Thenewnoise.var=0} #only one new point, with no noise
+      else {Thenewnoise.var <- rep(0,nrow(newX))}	 #many new points, with no noise							
+      object@noise.var <- c(object@noise.var,Thenewnoise.var) #merge old noise vector with new noises
     }
     if ((length(object@noise.var) != 0) && (!is.null(newnoise.var))) {
       ## noisy initial observations and noisy new observations
-      object@noise.var <- c(object@noise.var,newnoise.var)
+      object@noise.var <- c(object@noise.var,newnoise.var) #merge old noise vector with new noises
     }
     if ((length(object@noise.var) == 0) && (!is.null(newnoise.var))) {
       ## noise free initial observations and noisy new observations
       if (any(newnoise.var!=0)){
-        ##when previous noise are 0 AND all the new noises are 0 we are still noise free
-        noise.var.init <- rep(0,object@n)
-        object@noise.var <- c(noise.var.init,newnoise.var)
+        noise.var.init <- rep(0,object@n) #noise vector for initial observations (noise = 0)
+        object@noise.var <- c(noise.var.init,newnoise.var)  #merge old noise vector with new noises
       }
     }
     
-    if (cov.reestim) {
-      
-      ## case 1: new points, covariance parameter re-estimation (provided object@param.estim == true)
+    
+    if (cov.reestim | trend.reestim | nugget.reestim) {  
+      ## case 1: new points, covariance and/or trend parameter re-estimation (provided object@param.estim == true)
       if (object@param.estim) {
-        ## case 1a: here we re-estimate the covariance parameter
+        ## case 1a: here we re-estimate the covariance and/or trend parameter
         ## default values for the cov param estimation parameters - when they are not provided
+        TheCov <- object@covariance
+        TheClass <- class(TheCov)
+        
         if (is.null(kmcontrol$penalty)) kmcontrol$penalty <- object@penalty
-      
         if (length(object@penalty == 0)) kmcontrol$penalty <- NULL
         if (is.null(kmcontrol$optim.method)) kmcontrol$optim.method <- object@optim.method 
+        if (length(kmcontrol$optim.method) == 0) kmcontrol$optim.method <- "BFGS"
         if (is.null(kmcontrol$control)) kmcontrol$control <- object@control
+        if(length(object@gr) == 0) object@gr <- TRUE
+        knots <- NULL; if(TheClass == "covScaling") knots <- object@covariance@knots
         
-        ## retire
-        ## if (is.null(kmcontrol$parinit)) kmcontrol$parinit <- covparam2vect(object@covariance)
+        #filtre sur cov.reestim / trend.reestim
+        if(cov.reestim){
+          coef.cov <- NULL
+          coef.var <- NULL
+        }else{
+          if((TheClass == "covTensorProduct") | (TheClass == "covIso")) coef.cov <- object@covariance@range.val
+          if((TheClass == "covAffineScaling") | (TheClass == "covScaling")) coef.cov <- object@covariance@eta
+          
+          coef.var <- object@covariance@sd2
+        }
         
-        TheCov <- object@covariance
+        if(trend.reestim) {coef.trend <- NULL
+        } else { coef.trend <- object@trend.coef}
         
-        if (class(TheCov) == "covTensorProduct") {
+        if(length(object@covariance@nugget) == 0) {nugget <- NULL
+        } else{nugget <- object@covariance@nugget}
+        
+        nugget.estim <- nugget.reestim
+        
+        ## if (is.null(kmcontrol$parinit)) kmcontrol$parinit <- covparam2vect(object@covariance) ## retire
+        
+        if ((TheClass == "covTensorProduct") | (TheClass == "covIso") | (TheClass =="covAffineScaling") | (TheClass =="covScaling")) {
           object <- km(formula = object@trend.formula, design = object@X, response = object@y,
-                      covtype = object@covariance@name, lower = object@lower, upper = object@upper,
-                      noise.var = object@noise.var, penalty = kmcontrol$penalty,
-                      optim.method = kmcontrol$optim.method, control = kmcontrol$control,
-                      gr = object@gr)
-        } else if (class(TheCov) == "covIso") {
-          object <- km(formula = object@trend.formula, design = object@X, response = object@y,
-                      covtype = object@covariance@name, lower = object@lower, upper = object@upper,
-                      noise.var = object@noise.var, penalty = kmcontrol$penalty,
-                      optim.method = kmcontrol$optim.method,
-                      control = kmcontrol$control, gr = object@gr, iso = TRUE)              
-        } else if (class(TheCov)=="covScaling") {
-          knots <- object@covariance@knots
-          object <- km(formula = object@trend.formula, design = object@X, response = object@y,
-                      covtype = object@covariance@name, lower = object@lower, upper = object@upper,
-                      noise.var = object@noise.var, penalty = kmcontrol$penalty,
-                      optim.method = kmcontrol$optim.method,
-                      control = kmcontrol$control, gr = object@gr, scaling = TRUE, knots = knots)  
+                       covtype = object@covariance@name, 
+                       coef.trend = coef.trend, coef.cov = coef.cov, coef.var = coef.var,
+                       nugget=nugget,nugget.estim=nugget.estim,
+                       noise.var = object@noise.var, penalty = kmcontrol$penalty,optim.method = kmcontrol$optim.method,
+                       lower = object@lower, upper = object@upper,
+                       control = kmcontrol$control,gr = object@gr,
+                       iso =     (TheClass == "covIso"),
+                       scaling = (TheClass == "covAffineScaling" | TheClass == "covScaling"), 
+                       knots = knots)                
         } else {
           print("Unknown covariance type. Accepted types are \"covTensorProduct\", \"covIso\" and \"covScaling\"")
           return(0)
         }
       } else {
-        ## case 1b: no re-estimation because object@param.estim == FALSE. 
+        ## case 1b: no re-estimation at all because object@param.estim == FALSE. 
         ## Keeping the current covariance parameters
         
         object@n <- nrow(object@X)
@@ -480,14 +494,17 @@ update.km <- function(object,
 if(!isGeneric("update")) {
   setGeneric(name = "update",
              def = function(object, ...) standardGeneric("update")
-             )
+  )
 }
 
 setMethod("update", "km", 
-          function(object, newX, newy, newX.alreadyExist =  FALSE, cov.reestim = FALSE,
+          function(object, newX, newy, newX.alreadyExist =  FALSE, 
+                   cov.reestim = TRUE, trend.reestim = TRUE, nugget.reestim = FALSE,
                    newnoise.var = NULL, kmcontrol = NULL, newF = NULL, ...) {
             update.km(object=object, newX = newX, newy = newy, 
-                      newX.alreadyExist = newX.alreadyExist, cov.reestim = cov.reestim,
+                      newX.alreadyExist = newX.alreadyExist, 
+                      cov.reestim = cov.reestim, trend.reestim = trend.reestim, nugget.reestim = nugget.reestim,
                       newnoise.var = newnoise.var, kmcontrol = kmcontrol, newF = newF, ...) 
           }
-          )
+)
+

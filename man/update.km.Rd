@@ -13,12 +13,13 @@ It is also possible to modify the k last (existing) observations.
 
 \usage{
 \S4method{update}{km}(object, newX, newy, newX.alreadyExist = FALSE,
-          cov.reestim = FALSE, newnoise.var = NULL, kmcontrol = NULL, newF = NULL,...)
+          cov.reestim = TRUE, trend.reestim = TRUE, nugget.reestim = FALSE, 
+          newnoise.var = NULL, kmcontrol = NULL, newF = NULL,...)
 }
 
 \arguments{
   \item{object}{Kriging model of \code{\link[DiceKriging]{km}} class.}
-  
+
   \item{newX}{Matrix with \code{object@d} columns and r rows
   corresponding to the r locations of  the observations to be
   updated. These locations can be new  locations or existing ones.}
@@ -28,9 +29,13 @@ It is also possible to modify the k last (existing) observations.
   
   \item{newX.alreadyExist}{Boolean: indicate whether the locations \code{newX} are all news or not.}
   
-  \item{cov.reestim}{Boolean to decide whether the covariance parameters
-  of the  \code{\link[DiceKriging]{km}} object should be re-estimated.}
+  \item{cov.reestim}{Should the covariance parameters
+  of the \code{\link[DiceKriging]{km}} object be re-estimated?}
+
+  \item{trend.reestim}{Should the trend parameters be re-estimated?}
   
+  \item{nugget.reestim}{Should the nugget effect be re-estimated?}
+
   \item{newnoise.var}{Vector containing the noise variance at each new observations.}
 	  
   \item{kmcontrol}{Optional list representing the control variables for

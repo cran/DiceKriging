@@ -10,7 +10,7 @@
 Three plots are currently available, based on the \code{leaveOneOut.km} results: one plot of fitted values against response values, one plot of standardized residuals, and one qqplot of standardized residuals.
 }
 \usage{
-\S4method{plot}{km}(x, y = NULL, kriging.type = "UK", trend.reestim=FALSE, ...)
+\S4method{plot}{km}(x, y, kriging.type = "UK", trend.reestim = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
