@@ -5,11 +5,16 @@ function(model, envir) {
 	y <- model@y
 	F <- model@F
 
-  if (model@case=="NoNugget") case <- "Default"
-  if (model@case=="1Nugget") case <- "Nugget"
-  if (model@case=="Nuggets") case <- "Noisy"
-  
-  if (model@case=="Nuggets") {
+  # these 3 lines for retro-compatibility
+	if (model@case=="NoNugget") model@case <- "LLconcentration_beta_sigma2"
+	if (model@case=="1Nugget") model@case <- "LLconcentration_beta_v_alpha"
+	if (model@case=="Nuggets") model@case <- "LLconcentration_beta"
+	
+  if (model@case=="LLconcentration_beta_sigma2") case <- "Default"
+  if (model@case=="LLconcentration_beta_v_alpha") case <- "Nugget"
+  if (model@case=="LLconcentration_beta") case <- "Noisy"
+    
+  if (model@case=="LLconcentration_beta") {
     if (model@covariance@nugget.flag & !model@covariance@nugget.estim) nugget <- model@covariance@nugget
     if (model@noise.flag) nugget <- model@noise.var
   }
@@ -60,8 +65,8 @@ function(model, envir) {
 		if (case=="Default") { 
       cat("  - nugget : NO\n")
       cat("  - parameters lower bounds : ", lower, "\n")
-   	 cat("  - parameters upper bounds : ", upper, "\n")
- 		 cat("  - best initial point among ", model@control$pop.size, " : ", parinit, "\n")
+   	  cat("  - parameters upper bounds : ", upper, "\n")
+ 		  cat("  - best initial point among ", model@control$pop.size, " : ", parinit, "\n")
 		} else if (case=="Nugget") {
       cat("  - nugget : unknown homogenous nugget effect \n")
       #if (!is.null(nugget)) cat("with initial value : ", nugget)
@@ -222,6 +227,7 @@ function(model, envir) {
     
     param <- o$par
     lp <- length(param)
+    print(param)
 	  model@covariance@sd2 <- param[lp]
 	  model@covariance <- vect2covparam(model@covariance, param[1:(lp-1)])
     

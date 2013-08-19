@@ -2,6 +2,7 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{covScaling-class}
+\alias{coef,covScaling-method}
 \alias{covMat1Mat2,covScaling-method}
 \alias{covMatrix,covScaling-method}
 \alias{covMatrixDerivative,covScaling-method}
@@ -9,7 +10,6 @@
 \alias{covparam2vect,covScaling-method}
 \alias{vect2covparam,covScaling-method}
 \alias{show,covScaling-method}
-\alias{coefficients,covScaling-method}
 \alias{inputnames,covScaling-method}
 \alias{kernelname,covScaling-method}
 \alias{ninput,covScaling-method}
@@ -59,6 +59,7 @@ Class \code{"\linkS4class{covKernel}"}, directly.
 }
 \section{Methods}{
   \describe{
+    \item{coef}{\code{signature(object = "covScaling")}: ... }
     \item{covMat1Mat2}{\code{signature(object = "covScaling")}: ... }
     \item{covMatrix}{\code{signature(object = "covScaling")}: ... }
     \item{covMatrixDerivative}{\code{signature(object = "covScaling")}: ... }
@@ -66,7 +67,6 @@ Class \code{"\linkS4class{covKernel}"}, directly.
     \item{covparam2vect}{\code{signature(object = "covScaling")}: ... }
     \item{vect2covparam}{\code{signature(object = "covScaling")}: ... }
     \item{show}{\code{signature(object = "covScaling")}: ... }
-    \item{coefficients}{\code{signature(object = "covAffineScaling")}: ... }
     \item{inputnames}{\code{signature(x = "covAffineScaling")}: ... }
     \item{kernelname}{\code{signature(x = "covAffineScaling")}: ... }
     \item{ninput}{\code{signature(x = "covAffineScaling")}: ... }

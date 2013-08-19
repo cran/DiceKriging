@@ -7,7 +7,7 @@ function(param, model, envir=NULL) {
     beta <- NULL
   }
   
-	if (identical(model@case, "NoNugget")) {
+	if (identical(model@case, "LLconcentration_beta_sigma2")) {
 		
 		model@covariance <- vect2covparam(model@covariance, param)
 		model@covariance@sd2 <- 1		# to get the correlation matrix
@@ -30,14 +30,23 @@ function(param, model, envir=NULL) {
       envir$sigma2.hat <- sigma2.hat
 		}
 		
-	} else if (identical(model@case, "Nuggets")) {
+	} else if (identical(model@case, "LLconcentration_beta")) {
 		
 		nparam <- length(param)
-		
-		model@covariance <- vect2covparam(model@covariance, param[1:(nparam-1)])
-		model@covariance@sd2 <- param[nparam]
-		
-		aux <- covMatrix(model@covariance, model@X, noise.var=model@noise.var)
+    if (class(model@covariance) != "covAdditive0") {
+		  model@covariance <- vect2covparam(model@covariance, param[1:(nparam-1)])
+		  model@covariance@sd2 <- param[nparam]
+    } else {
+      model@covariance <- vect2covparam(model@covariance, param)
+    }
+    
+# 		if (model@covariance@nugget.estim) {
+#       coef(model@covariance, type="all") <- param
+# 		} else {
+#       coef(model@covariance, type="all-nugget") <- param
+# 		}
+# 		# pb ici : reconnaitre les variables a estimer ? 
+    aux <- covMatrix(model@covariance, model@X, noise.var=model@noise.var)
 	
 		C <- aux[[1]]
 		vn <- aux[[2]]
@@ -56,7 +65,7 @@ function(param, model, envir=NULL) {
       envir$z <- z
 		}
 				
-	} else if (identical(model@case, "1Nugget")) {
+	} else if (identical(model@case, "LLconcentration_beta_v_alpha")) {
 	
 		nparam <- length(param)
 			

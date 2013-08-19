@@ -1,4 +1,14 @@
-## DiceKriging 1.5.1
+## DiceKriging 1.5.2
+
+## change / DiceKriging 1.5.1
+
+	* creation of a coef method
+	* trend.deltax: Default value for h is now fixed to sqrt(.Machine$double.eps) instead of 1e-8.
+
+	* Internal: The cases for optimisation now explicitely depend on the way likelihood is concentrated. Expert users: Mind that the 3 character strings for the slot 'case' have changed.
+
+	* Internal: Reorganisation of methods, according to covariance classes (One file per covariance, containing all the related methods)
+ 
 
 ## change / DiceKriging 1.5
 
@@ -9,6 +19,8 @@
 
 ## change / DiceKriging 1.4.0 & 1.4.1
 	
+	* covMatrix: Now returns C and the vector vn, instead of the two matrices C0 and C.	
+
 	* update.km : new function/method.
 
 	* Leave-One-Out: implementation of the Dubrule's formula, see 'leaveOneOut.km'.

@@ -1,10 +1,7 @@
 `leaveOneOutGrad` <-
 function(param, model, envir) {
 	
-  standardCase <- model@case == "NoNugget"
-#  knownNugget <- model@covariance@nugget.flag & (!model@covariance@nugget.estim)
-  
-  if (standardCase) {
+  if (model@case == "LLconcentration_beta_sigma2") {
     
 		R <- envir$R
     Q <- envir$Q
@@ -19,7 +16,7 @@ function(param, model, envir) {
 		LOOfunDer <- matrix(0, nparam, 1)
 										
 		for (k in 1:nparam) {
-			gradR.k <- covMatrixDerivative(model@covariance, X=model@X, C=R, k=k)
+			gradR.k <- covMatrixDerivative(model@covariance, X=model@X, C0=R, k=k)
 			diagdQ <- - diagABA(A=Q, B=gradR.k)
 			dsigma2LOO <- - (sigma2LOO^2) * diagdQ
 			derrorsLOO <- dsigma2LOO * Q.y - sigma2LOO * (Q%*%(gradR.k%*%Q.y))

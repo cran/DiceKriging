@@ -31,42 +31,44 @@ Y. Xiong, W. Chen, D. Apley, and X. Ding (2007), \emph{Int. J. Numer. Meth. Engn
 ###############################
 
 knots <- list(c(0,0.3,1))
-eta <- list(matrix(c(2,0.4,1.2), nrow=1))
+eta <- list(matrix(c(2,0.4,1.2), nrow = 1))
 eps <- 0 #0.0001
-t <- matrix(seq(0+eps,1-eps,,399), ncol=1)
-f <- scalingFun(t,knots,eta)
+t <- matrix(seq(0 + eps, 1 - eps, , 399), ncol = 1)
+f <- scalingFun(t, knots, eta)
 
-plot(t,f, type="l", main=expression(f[j]), xlab=expression(x[j]), ylab=expression(f[j])) 
-
-text(0.7, 0.3, expression(f[j](x[j]) == integral(g[j](t)*dt, 0, x[j] ) ) , cex=2)
+plot(t,f, type="l", main = expression(f[j]), xlab = expression(x[j]), ylab = expression(f[j]))
+text(0.7, 0.3, expression(f[j](x[j]) == integral(g[j](t)*dt, 0, x[j] ) ), cex = 2)
 
 ###############################
 # ...and the corresponding density!
 ###############################
 
 ScalingDensity1d <- function(t, knots_j, eta_j){
-ind_right <- which.max(knots_j-t>=0)
-if(ind_right==1){f <- eta_j[ind_right]}
-else{
-f <- eta_j[ind_right-1] + ((eta_j[ind_right]-eta_j[ind_right-1])/(knots_j[ind_right]-knots_j[ind_right-1]))*(t-knots_j[ind_right-1]) 
-}
-return(f)
+  ind_right <- which.max(knots_j - t >= 0)
+  if (ind_right == 1){
+    f <- eta_j[ind_right]
+  } else {
+    f <- eta_j[ind_right - 1] + ((eta_j[ind_right] - eta_j[ind_right - 1])
+    /(knots_j[ind_right]-knots_j[ind_right - 1]))*(t-knots_j[ind_right - 1]) 
+  }
+  return(f)
 }
 
 knots <- c(0,0.3,1)
 eta <- c(2,0.4,1.2)
 t <- seq(0,1,,400)
-f <- apply(as.matrix(t),1,ScalingDensity1d, knots_j=knots, eta_j=eta)
+f <- apply(as.matrix(t), 1, ScalingDensity1d, knots_j = knots, eta_j = eta)
 
-plot(t,f, type="l", ylim=c(0,2.2), xlab=expression(x[j]), ylab=expression(g[j]), 
-main=expression(g[j]))
+plot(t, f, type = "l", ylim = c(0,2.2), xlab = expression(x[j]), ylab = expression(g[j]),
+           main = expression(g[j])) 
 
 eps <- 0.15
-text(knots,eta+eps, labels=c(expression(eta[1]^j),expression(eta[2]^j),expression(eta[3]^j)),  cex = 1.8 )
+text(knots, eta + eps, labels = c(expression(eta[1]^j), expression(eta[2]^j),
+                                  expression(eta[3]^j)), cex = 1.8)
 
-mtext(expression(zeta[1]^j), side=1, cex = 1.8, at=0, padj=1.7 )
-mtext(expression(zeta[2]^j), side=1, cex = 1.8, at=0.3, padj=1.7 )
-mtext(expression(zeta[3]^j), side=1, cex = 1.8, at=1, padj=1.7 )
+mtext(expression(zeta[1]^j), side=1, cex = 1.8, at=0, padj=1.7)
+mtext(expression(zeta[2]^j), side=1, cex = 1.8, at=0.3, padj=1.7)
+mtext(expression(zeta[3]^j), side=1, cex = 1.8, at=1, padj=1.7)
 
 segments(x0=knots[1], y0=0, x1=knots[1], y1=eta[1], lty=2)
 segments(x0=knots[2], y0=0, x1=knots[2], y1=eta[2], lty=2)

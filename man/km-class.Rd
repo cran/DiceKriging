@@ -1,6 +1,7 @@
 \name{km-class}
 \docType{class}
 \alias{km-class}
+\alias{coef,km-method}
 %%\alias{plot,km-method}
 %%\alias{predict,km-method}
 %%\alias{show,km-method}
@@ -28,7 +29,7 @@ To create a \code{km} object, use \code{\link{km}}. See also this function for m
     \item{\code{noise.flag}:}{Object of class \code{"logical"}. Are the observations noisy? }
     \item{\code{noise.var}:}{Object of class \code{"numeric"}. If the observations are noisy, the vector of noise variances. }
     \item{\code{known.param}:}{Object of class \code{"character"}. Internal use. One of: \code{"None", "All", "CovAndVar"} or \code{"Trend"}. }
-    \item{\code{case}:}{Object of class \code{"character"}. Internal use. One of: \code{"NoNugget", "1Nugget", "Nuggets"}. }
+    \item{\code{case}:}{Object of class \code{"character"}. Indicates the likelihood to use in estimation (Internal use). One of: \code{"LLconcentration_beta", "LLconcentration_beta_sigma2", "LLconcentration_beta_v_alpha"}. }
     \item{\code{param.estim}:}{Object of class \code{"logical"}. \code{TRUE} if at least one parameter is estimated, \code{FALSE} otherwise. }
     \item{\code{method}:}{Object of class \code{"character"}. \code{"MLE"} or \code{"PMLE"} depending on \code{penalty}. }
     \item{\code{penalty}:}{Object of class \code{"list"}. For penalized ML estimation. }
@@ -48,6 +49,7 @@ To create a \code{km} object, use \code{\link{km}}. See also this function for m
 
 \section{Methods}{
   \describe{
+    \item{coef}{\code{signature(x = "km")} Get the coefficients of the \code{km} object. }
     \item{plot}{\code{signature(x = "km")}: see \code{\link{plot,km-method}}. }
     \item{predict}{\code{signature(object = "km")}: see \code{\link{predict,km-method}}. }
     \item{show}{\code{signature(object = "km")}: see \code{\link{show,km-method}}. }

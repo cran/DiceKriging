@@ -3,9 +3,39 @@ function(model) {
 
 	n <- nrow(model@X)
 	parinit <- model@parinit
-
-	if (model@covariance@nugget.flag & !model@covariance@nugget.estim) nugget.aux <- rep(model@covariance@nugget, n)
-	if (model@noise.flag) nugget.aux <- model@noise.var
+	lower <- model@lower
+	upper <- model@upper
+	ninit <- model@control$pop.size
+	param.n <- model@covariance@param.n
+  
+	if (model@covariance@nugget.flag & !model@covariance@nugget.estim) {
+    nugget.aux <- rep(model@covariance@nugget, n)
+	}
+  
+  if (length(parinit)>0) {
+	  matrixinit <- matrix(parinit, nrow = param.n, ncol = ninit) 
+	} else {
+	  if (existsMethod("paramSample", signature = class(model@covariance))) {
+      matrixinit <- paramSample(model@covariance, n=ninit, lower=lower, upper=upper, y=model@y)
+    } else {
+      # sample ninit design points, generated from uniform [lower, upper]
+      matrixinit <- matrix(runif(ninit*param.n), nrow = param.n, ncol = ninit)
+      matrixinit <- lower + matrixinit*(upper - lower)
+	  }
+	}
+  
+	if (class(model@covariance)=="covAdditive0") {
+    if (length(parinit)==0) {
+      logLikinit <- apply(matrixinit, 2, logLikFun, model)
+      print(logLikinit)
+      parinit <- matrixinit[, which.max(logLikinit)]  
+    }
+    model@covariance <- vect2covparam(model@covariance, parinit)
+    model@parinit <- parinit
+    return(model)
+	}
+  if (model@noise.flag) nugget.aux <- model@noise.var
+  
 	
 		# variance standard estimate (biased negatively)
 	trend.estimate <- lm(model@y~model@F-1)
@@ -43,28 +73,11 @@ function(model) {
 		# final choice
 	varinit.lower <- 1/10*min(varinit.lower, varinit.vario.lower)
 	varinit.upper <- 10*max(varinit.upper, varinit.vario.upper)
-		
-		
-	lower <- model@lower
-	upper <- model@upper
-	ninit <- model@control$pop.size
-	param.n <- model@covariance@param.n
-	
-	if (identical(parinit, numeric(0))) {
-			# sample ninit design points, generated from uniform [lower, upper]
-		matrixinit <- matrix(runif(ninit*param.n), param.n, ninit)
-    if ((!is(model@covariance, "covAffineScaling")) & (!is(model@covariance, "covScaling"))) {
-  	  matrixinit <- lower + matrixinit*(upper - lower)
-    } else {
-      matrixinit <- 1/upper + matrixinit*(1/lower - 1/upper)
-      matrixinit <- 1/matrixinit
-    }    
-	} else matrixinit <- matrix(parinit, param.n, ninit) 
 			
 	varinit.sim <- runif(n=ninit, min=1/2*varinit, max=3/2*varinit)       
 				
 		# take the best point				 
-	matrixinit <- rbind(matrixinit, varinit.sim)     
+  matrixinit <- rbind(matrixinit, varinit.sim)
 	logLikinit <- apply(matrixinit, 2, logLikFun, model)
 	parinit <- matrixinit[, which.max(logLikinit)]     
 		

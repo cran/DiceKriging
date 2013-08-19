@@ -1,10 +1,7 @@
 `leaveOneOutFun` <-
 function(param, model, envir=NULL) {
-	
-  standardCase <- model@case == "NoNugget"
-#  knownNugget <- model@covariance@nugget.flag & (!model@covariance@nugget.estim)
-  
-	if (standardCase) {
+	    
+	if (model@case == "LLconcentration_beta_sigma2") {
 		
 		model@covariance <- vect2covparam(model@covariance, param)
 		model@covariance@sd2 <- 1		# to get the correlation matrix

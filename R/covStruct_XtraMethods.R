@@ -6,54 +6,6 @@
 ##*****************************************************************
 
 
-##=================================================================
-## coefficients
-##=================================================================
-
-if(!isGeneric("coefficients")) {
-  setGeneric(name = "coefficients",
-    def = function(object, ...) standardGeneric("coefficients"))
-}
-
-setMethod("coefficients",
-          signature(object = "covIso"),
-          function(object, type = c("range", "sd2"), ...) {
-            type <- match.arg(type)
-            if (type == "sd2") co <- object@sd2
-            else if (type == "range")  co <- object@range.val
-            attr(co, "type") <- type
-            co
-          })
-
-setMethod("coefficients",
-          signature(object = "covTensorProduct"),
-          function(object, type = c("range", "sd2"), ...) {
-            type <- match.arg(type)
-            if (type == "sd2") co <- object@sd2
-            else if (type == "range")  co <- object@range.val
-            attr(co, "type") <- type
-            co
-          })
-
-setMethod("coefficients",
-          signature(object = "covAffineScaling"),
-          function(object, type = c("sd2", "eta"), ...) {
-            type <- match.arg(type)
-            if (type == "sd2") co <- object@sd2
-            else if (type == "eta")  co <- object@eta
-            attr(co, "type") <- type
-            co
-          })
-          
-setMethod("coefficients",
-          signature(object = "covScaling"),
-          function(object, type = c("sd2", "eta"), ...) {
-            type <- match.arg(type)
-            if (type == "sd2") co <- object@sd2
-            else if (type == "eta")  co <- object@eta
-            attr(co, "type") <- type
-            co
-          })
 
 ##=================================================================
 ## summary should in the future return objects with the right class

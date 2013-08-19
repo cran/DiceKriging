@@ -12,8 +12,8 @@ Estimation, validation and prediction of kriging models.
 \tabular{ll}{
 Package: \tab DiceKriging\cr
 Type: \tab Package\cr
-Version: \tab 1.5.1\cr
-Date: \tab 2013-02-18\cr
+Version: \tab 1.5.2\cr
+Date: \tab 2013-08-19\cr
 License: \tab GPL-2 | GPL-3 \cr
 }
 }
@@ -26,7 +26,7 @@ License: \tab GPL-2 | GPL-3 \cr
 
 \references{
 
-F. Bachoc (+2012), Cross validation and maximum likelihood estimations of hyper-parameters of Gaussian processes with model misspecification. Submitted. \url{http://www.lpma.math.upmc.fr/pageperso/bachoc/CSDA2011.pdf}
+F. Bachoc (2013), Cross Validation and Maximum Likelihood estimations of hyper-parameters of Gaussian processes with model misspecification. \emph{Computational Statistics and Data Analysis}, \bold{66}, 55-69. \url{http://www.lpma.math.upmc.fr/pageperso/bachoc/publications.html}
 
 N.A.C. Cressie (1993), \emph{Statistics for spatial data}, Wiley series in probability and mathematical statistics.
 
@@ -78,7 +78,7 @@ Y. Xiong, W. Chen, D. Apley, and X. Ding (2007), \emph{Int. J. Numer. Meth. Engn
 \note{
 A previous version of this package was conducted within the frame of the DICE (Deep Inside Computer Experiments) Consortium between ARMINES, Renault, EDF, IRSN, ONERA and TOTAL S.A. (http://dice.emse.fr/).
 
-The authors wish to thank Laurent Carraro, Delphine Dupuy and Celine Helbert for fruitful discussions about the structure of the code. They also thank Gregory Six and Gilles Pujol for their advices on practical implementation issues, as well as the DICE members for useful feedbacks.
+The authors wish to thank Laurent Carraro, Delphine Dupuy and Celine Helbert for fruitful discussions about the structure of the code, and Francois Bachoc for his participation in validation and estimation by leave-one-out. They also thank Gregory Six and Gilles Pujol for their advices on practical implementation issues, as well as the DICE members for useful feedbacks.
 
 Package \code{rgenoud} >=5.3.3. is recommended.
 

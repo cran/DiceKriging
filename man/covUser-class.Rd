@@ -2,6 +2,7 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{covUser-class}
+\alias{coef,covUser-method}
 \alias{covMat1Mat2,covUser-method}
 \alias{covMatrix,covUser-method}
 \alias{show,covUser-method}
@@ -31,6 +32,7 @@ Class \code{"\linkS4class{covKernel}"}, directly.
 
 \section{Methods}{
   \describe{
+    \item{coef}{\code{signature(object = "covUser")}: ... }
     \item{covMat1Mat2}{\code{signature(object = "covScaling")}: ... }
     \item{covMatrix}{\code{signature(object = "covScaling")}: ... }
     \item{show}{\code{signature(object = "covScaling")}: ... }

@@ -1,4 +1,4 @@
-trend.deltax <- function(x, model, h=1e-8){
+trend.deltax <- function(x, model, h=sqrt(.Machine$double.eps)){
   
   n <- model@n
   d <- model@d

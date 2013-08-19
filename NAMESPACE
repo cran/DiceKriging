@@ -1,11 +1,10 @@
 useDynLib(DiceKriging) 
 
+import(methods)
 importFrom("graphics", plot)
-#importFrom("methods", show)
 importFrom("stats", predict)
 importFrom("stats", coef)
 importFrom("stats", coefficients)
-#importFrom("stats", summary)
 importFrom("stats", simulate)
 importFrom("stats", update)
 
@@ -13,7 +12,7 @@ importFrom("stats", update)
 exportClasses(covTensorProduct, covIso, covScaling, covKernel, km, covAffineScaling, covUser)
 ## All methods, for own or "foreign" generics:
 exportMethods(show, plot, predict, simulate, update, covMatrix, covMat1Mat2, 
-covMatrixDerivative, covVector.dx, covParametersBounds, covparam2vect, vect2covparam, coefficients, summary, inputnames, ninput, kernelname, nuggetvalue, "nuggetvalue<-", nuggetflag)
+covMatrixDerivative, covVector.dx, covParametersBounds, covparam2vect, vect2covparam, coef, "coef<-", summary, inputnames, ninput, kernelname, nuggetvalue, "nuggetvalue<-", nuggetflag)
 
 export(branin, 
        camelback, 

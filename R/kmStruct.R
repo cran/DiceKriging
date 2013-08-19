@@ -87,6 +87,25 @@ setMethod("show", "km",
             show.km(object)		
           }
           )
+
+##*****************************************************************************
+##                            C O E F  METHOD
+##*****************************************************************************
+
+setMethod("coef", "km", 
+          function(object, type = "all", as.list = TRUE){
+            if (is.element(type, c("all", "all-nugget", "all-sd2-nugget"))) {
+              val <- c(trend=object@trend.coef, coef(object@covariance, type = type))
+              if (!as.list) val <- unlist(val, use.names = FALSE)
+            } else if (type=="trend") {
+              val <- object@trend.coef
+            } else {
+              val <- coef(object@covariance, type = type, as.list=as.list)
+            }
+            return(val)
+          }
+)
+
 ##*****************************************************************************
 ##                            P L O T  METHOD
 ##*****************************************************************************

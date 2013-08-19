@@ -2,7 +2,7 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{covIso-class}
-\alias{coefficients,covIso-method}
+\alias{coef,covIso-method}
 \alias{covMat1Mat2,covIso-method}
 \alias{covMatrix,covIso-method}
 \alias{covMatrixDerivative,covIso-method}
@@ -85,7 +85,7 @@ Class \code{"\linkS4class{covKernel}"}, directly.
 
 \section{Methods}{
   \describe{
-    \item{coefficients}{\code{signature(object = "covIso")}: ... }
+    \item{coef}{\code{signature(object = "covIso")}: ... }
     \item{covMat1Mat2}{\code{signature(object = "covIso")}: ... }
     \item{covMatrix}{\code{signature(object = "covIso")}: ... }
     \item{covMatrixDerivative}{\code{signature(object = "covIso")}: ... }

@@ -1,7 +1,7 @@
 `logLikGrad` <-
 function(param, model, envir) {
 
-  if (identical(model@case, "NoNugget")) {
+  if (identical(model@case, "LLconcentration_beta_sigma2")) {
     
     R <- envir$R
     T <- envir$T
@@ -23,7 +23,7 @@ function(param, model, envir) {
 		xx.upper <- xx[upper.tri(xx)]
 
 		for (k in 1:nparam) {
-			gradR.k <- covMatrixDerivative(model@covariance, X=model@X, C=R, k=k)
+			gradR.k <- covMatrixDerivative(model@covariance, X=model@X, C0=R, k=k)
 			gradR.k.upper <- gradR.k[upper.tri(gradR.k)]
 		
 			terme1 <- sum(xx.upper*gradR.k.upper)   / sigma2.hat   
@@ -39,7 +39,7 @@ function(param, model, envir) {
 			logLik.derivative <- logLik.derivative + penalty
 		}
 	
-	} else if (identical(model@case, "Nuggets")) {
+	} else if (identical(model@case, "LLconcentration_beta")) {
 	
 		nparam <- length(param)
 	
@@ -49,33 +49,19 @@ function(param, model, envir) {
 		logLik.derivative <- matrix(0,nparam,1)
 							
 		C <- envir$C
-    T <- envir$T 
-    vn <- envir$vn
-    z <- envir$z
+		T <- envir$T 
+		vn <- envir$vn
+		z <- envir$z
     
 		x <- backsolve(T,z)			# x := T^(-1)*z
 		Cinv <- chol2inv(T)			# Invert R from given T
-	
-		Cinv.upper <- Cinv[upper.tri(Cinv)]
-		xx <- x%*%t(x)
-		xx.upper <- xx[upper.tri(xx)]
 
-		# partial derivative with respect to parameters except sigma^2
-		for (k in 1:(nparam-1)) {
-			#gradC.k <- gradC[[k]]
-			gradC.k <- covMatrixDerivative(model@covariance, X=model@X, C=C, k=k)
-			gradC.k.upper <- gradC.k[upper.tri(gradC.k)]
-			term1 <- sum(xx.upper*gradC.k.upper) #/ sigma2
-				# economic computation of - t(x)%*%gradC.k%*%x / sigma2      
-			term2 <- - sum(Cinv.upper*gradC.k.upper) 
-				# economic computation of trace(Cinv%*%gradC.k)
-			logLik.derivative[k] <- term1 + term2
+    for (k in 1:(nparam)) {
+			gradC.k <- covMatrixDerivative(model@covariance, X = model@X, C0 = C - diag(vn), k = k)
+			term1 <- -t(x)%*%gradC.k%*%x
+			term2 <- sum(Cinv*gradC.k)			# economic computation of trace(Cinv%*%gradC.k)
+			logLik.derivative[k] <- -0.5*(term1 + term2) #/sigma2
 		}
-		# partial derivative with respect to sigma^2
-		dCdsigma2 <- (C-diag(vn))/sigma2   # C0 = C - diag(vn)
-		term1 <- -t(x)%*%dCdsigma2%*%x 
-		term2 <- sum(Cinv*dCdsigma2)       # economic computation of trace(Cinv%*%C0)
-		logLik.derivative[nparam] <- -0.5*(term1 + term2) #/sigma2
 	
 		if (model@method=="PMLE") {
 			fun.derivative <- match.fun(model@penalty$fun.derivative)
@@ -85,7 +71,7 @@ function(param, model, envir) {
 			logLik.derivative[param.pen.pos] <- logLik.derivative[param.pen.pos] + penalty
 		}
 		
-	} else if (identical(model@case, "1Nugget")) {
+	} else if (identical(model@case, "LLconcentration_beta_v_alpha")) {
 		
 		nparam <- length(param)
 	
@@ -110,7 +96,7 @@ function(param, model, envir) {
 
 		# partial derivative with respect to parameters except sigma^2
 		for (k in 1:(nparam-1)) {
-			gradC.k <- covMatrixDerivative(model@covariance, X=model@X, C=R0, k=k)
+			gradC.k <- covMatrixDerivative(model@covariance, X=model@X, C0=R0, k=k)
 			gradC.k <- alpha*gradC.k
 			gradC.k.upper <- gradC.k[upper.tri(gradC.k)]
 			term1 <- sum(xx.upper*gradC.k.upper) / v

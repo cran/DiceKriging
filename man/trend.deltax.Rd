@@ -7,13 +7,13 @@ Trend derivatives
 Computes the gradient of the vector of trend basis functions f(x)=(f1(x);...;fp(x))
 }
 \usage{
-trend.deltax(x, model, h = 1e-08)
+trend.deltax(x, model, h = sqrt(.Machine$double.eps))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ a vector representing the specific location.}
   \item{model}{ an object of class km.} 
-  \item{h}{ the precision for numerical derivatives. Default to 1e-8.}
+  \item{h}{ the precision for numerical derivatives.}
 }
 
 \value{

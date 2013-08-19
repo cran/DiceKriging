@@ -30,7 +30,7 @@ where \emph{n} is the total number of observations.
 
 \references{ 
 
-F. Bachoc (+2012), Cross validation and maximum likelihood estimations of hyper-parameters of Gaussian processes with model misspecification. Submitted. \url{http://www.lpma.math.upmc.fr/pageperso/bachoc/CSDA2011.pdf}
+F. Bachoc (2013), Cross Validation and Maximum Likelihood estimations of hyper-parameters of Gaussian processes with model misspecification. \emph{Computational Statistics and Data Analysis}, \bold{66}, 55-69. \url{http://www.lpma.math.upmc.fr/pageperso/bachoc/publications.html}
 
 N.A.C. Cressie (1993), \emph{Statistics for spatial data}, Wiley series in probability and mathematical statistics.
 

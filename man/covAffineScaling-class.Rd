@@ -2,7 +2,7 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{covAffineScaling-class}
-\alias{coefficients,covAffineScaling-method}
+\alias{coef,covAffineScaling-method}
 \alias{covMat1Mat2,covAffineScaling-method}
 \alias{covMatrix,covAffineScaling-method}
 \alias{covMatrixDerivative,covAffineScaling-method}
@@ -61,7 +61,7 @@ Class \code{"\linkS4class{covKernel}"}, directly.
 }
 \section{Methods}{
   \describe{
-    \item{coefficients}{\code{signature(object = "covAffineScaling")}: ... }
+    \item{coef}{\code{signature(object = "covAffineScaling")}: ... }
     \item{covMat1Mat2}{\code{signature(object = "covAffineScaling")}: ... }
     \item{covMatrix}{\code{signature(object = "covAffineScaling")}: ... }
     \item{covMatrixDerivative}{\code{signature(object = "covAffineScaling")}: ... }

@@ -16,11 +16,12 @@ function(formula = ~1, design, response, covtype = "matern5_2",
   model@call <- match.call()
   
   ## formula : remove automatically the response from it
-  data = data.frame(design)
+  data <- data.frame(design)
   model@trend.formula <- formula <- drop.response(formula, data = data)
   F <- model.matrix(formula, data=data)
   
-  X <- as.matrix(design)
+  # X <- as.matrix(design)
+  X <- as.matrix(data)
   y <- as.matrix(response)
 	model@X <- X
 	model@y <- y
@@ -156,20 +157,37 @@ function(formula = ~1, design, response, covtype = "matern5_2",
   
   validObject(model, complete=TRUE)
   
-  if ((length(noise.var) != 0) || ((length(nugget) != 0) && (!nugget.estim))) {
-    model@case <- "Nuggets"
+  varStationaryClass <- c("covTensorProduct", "covScaling", "covAffineScaling", "covIso")
+  
+  if (length(noise.var)!=0) {   # noisy observations
+    model@case <- "LLconcentration_beta"
+  } else if (!is.element(class(model@covariance), varStationaryClass)) {
+    model@case <- "LLconcentration_beta"
+  } else {   # variance-stationary kernels
+      knownNugget <- ((length(nugget) > 0) && (!nugget.estim))
+      if (nugget.estim) {    # then concentrate / beta, v=sigma^2+tau^2 and alpha=sigma^2/v
+        model@case <- "LLconcentration_beta_v_alpha"
+      } else if (knownNugget) {
+        model@case <- "LLconcentration_beta"   
+      } else {
+        model@case <- "LLconcentration_beta_sigma2"
+      }
   }
   
-  if ((length(nugget) == 0) && (!nugget.estim) && (length(noise.var) == 0)) {
-    model@case <- "NoNugget"
-  } 
-  
-  if ((length(noise.var) == 0) && (nugget.estim)) {
-    model@case <- "1Nugget"
-  } 
+#   if ((length(noise.var) != 0) || ((length(nugget) != 0) && (!nugget.estim))) {
+#     model@case <- "Nuggets"
+#   }
+#   
+#   if ((length(nugget) == 0) && (!nugget.estim) && (length(noise.var) == 0)) {
+#     model@case <- "NoNugget"
+#   } 
+#   
+#   if ((length(noise.var) == 0) && (nugget.estim)) {
+#     model@case <- "1Nugget"
+#   } 
   
 #  knownNugget <- (length(nugget)>0) & (!nugget.estim)
-  if ((model@method=="LOO") & (model@case!="NoNugget")) {
+  if ((model@method=="LOO") & (model@case!="LLconcentration_beta_sigma2")) {
     stop("leave-One-Out is not available for this model")
   }
   

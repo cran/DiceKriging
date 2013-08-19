@@ -1,6 +1,26 @@
 `covStruct.create` <- 
 function(covtype, d, known.covparam, var.names, coef.cov=NULL, coef.var=NULL, nugget=NULL, nugget.estim=FALSE, nugget.flag=FALSE, iso=FALSE, scaling=FALSE, knots=NULL, kernel=NULL) {
 	
+  if (covtype=="matern5_2add0") {
+    weight <- coef.cov[(d+1):(2*d)]
+    covStruct <- new("covAdditive0", 
+                     d = as.integer(d),  
+                     name = "matern5_2add0",
+                     var.names = as.character(var.names),
+                     sd2 = as.numeric(sum(weight)),
+                     known.covparam = as.character(known.covparam),
+                     range.val = as.numeric(coef.cov[1:d]),
+                     range.names = paste("range", var.names, sep="."),
+                     weight = as.numeric(weight),
+                     weight.names = paste("weight", var.names, sep="."),
+                     nugget = as.numeric(nugget),
+                     nugget.flag = TRUE,
+                     nugget.estim = nugget.estim,
+                     param.n = as.integer(2*d+1)
+    )
+    return(covStruct)
+  }
+  
   if( covtype=="covUser" ){
     covStruct <- new("covUser", kernel=kernel, nugget.flag=length(nugget)>0, nugget=as.double(nugget))
 	  return(covStruct)
