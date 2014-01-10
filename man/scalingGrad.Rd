@@ -24,6 +24,7 @@ Gradient of the Scaling function of Xiong et al. with respect to eta
 \references{
 Y. Xiong, W. Chen, D. Apley, and X. Ding (2007), \emph{Int. J. Numer. Meth. Engng}, A non-stationary covariance-based Kriging method for metamodelling in engineering design. 
 }
-%\examples{
-%}
+
+\seealso{ \code{\link{scalingFun}} }
+
 \keyword{models}

@@ -12,8 +12,8 @@ Estimation, validation and prediction of kriging models.
 \tabular{ll}{
 Package: \tab DiceKriging\cr
 Type: \tab Package\cr
-Version: \tab 1.5.2\cr
-Date: \tab 2013-08-19\cr
+Version: \tab 1.5.3\cr
+Date: \tab 2014-01-10\cr
 License: \tab GPL-2 | GPL-3 \cr
 }
 }

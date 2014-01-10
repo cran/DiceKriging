@@ -21,9 +21,10 @@ affineScalingGrad(X, knots, k)
 Gradient at X of the scaling transformation of Xiong et al. with respect to eta. In the present version of the function, the gradient calculation is restricted to the case of 2 parameters by dimension (corresponding to the CovAffineScaling class).
 }
 
+\seealso{ \code{\link{scalingGrad}} }
+
 \references{
-Y. Xiong, W. Chen, D. Apley, and X. Ding (2007), \emph{Int. J. Numer. Meth. Engng}, A non-stationary covariance-based Kriging method for metamodelling in engineering design. 
+Y. Xiong, W. Chen, D. Apley, and X. Ding (2007), \emph{Int. J. Numer. Meth. Engng}, A non-stationary covariance-based Kriging method for metamodelling in engineering design.
 }
-%\examples{
-%}
+
 \keyword{models}

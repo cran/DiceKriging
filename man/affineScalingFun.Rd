@@ -21,9 +21,10 @@ affineScalingFun(X, knots, eta)
 The image of X by a scaling transformation of parameters knots and eta
 }
 
+\seealso{ \code{\link{scalingFun}} }
+
 \references{
 Y. Xiong, W. Chen, D. Apley, and X. Ding (2007), \emph{Int. J. Numer. Meth. Engng}, A non-stationary covariance-based Kriging method for metamodelling in engineering design. 
 }
-%\examples{
-%}
+
 \keyword{models}

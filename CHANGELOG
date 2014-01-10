@@ -1,4 +1,8 @@
-## DiceKriging 1.5.2
+## DiceKriging 1.5.3
+
+## change / DiceKriging 1.5.2
+  * Non-ASCII parameters removed in two help files
+  * Help file of ScalingFun improved
 
 ## change / DiceKriging 1.5.1
 
