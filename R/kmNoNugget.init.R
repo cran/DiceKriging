@@ -1,12 +1,12 @@
 `kmNoNugget.init` <-
-function(model) {
+function(model, fn, fnscale) {
 
 	parinit <- model@parinit
-	ninit <- model@control$pop.size
+  ninit <- model@control$pop.size
 	param.n <- model@covariance@param.n      
 	
-	if (length(parinit)>0) {
-	  matrixinit <- matrix(parinit, nrow = param.n, ncol = ninit) 
+	if (length(parinit) > 0) {
+	  matrixinit <- matrix(parinit, nrow = param.n, ncol = 1)    
 	} else {
 	  lower <- model@lower
 	  upper <- model@upper
@@ -17,12 +17,24 @@ function(model) {
 	    matrixinit <- matrix(runif(ninit*param.n), nrow = param.n, ncol = ninit)
 	    matrixinit <- lower + matrixinit*(upper - lower)
 	  }
-		# take the best point				     
-		logLikinit <- apply(matrixinit, 2, logLikFun, model)
-		parinit <- matrixinit[, which.max(logLikinit)]    
 	}
-	
-	model@parinit <- as.numeric(parinit)	
   
-	return(model)
-}
+  # take the best point(s)
+	fninit <- apply(matrixinit, 2, fn, model)
+  selection <- sort(fninit, decreasing = (fnscale < 0), index.return = TRUE)$ix
+  selection <- selection[1:model@control$multistart]
+	parinit <- matrixinit[, selection, drop = FALSE]  
+  # for one point : parinit <- matrixinit[, which.max(fninit), drop = FALSE]  		
+	
+	covinit <- list()
+  for (i in 1:model@control$multistart){
+	  covinit[[i]] <- vect2covparam(model@covariance, parinit[,i])
+	}
+  
+  return(list(par = parinit, 
+              value = fninit[selection], 
+              cov = covinit,
+              lower = model@lower,
+              upper = model@upper))	       
+	
+}	

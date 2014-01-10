@@ -24,16 +24,6 @@ function(model) {
 	  }
 	}
   
-	if (class(model@covariance)=="covAdditive0") {
-    if (length(parinit)==0) {
-      logLikinit <- apply(matrixinit, 2, logLikFun, model)
-      print(logLikinit)
-      parinit <- matrixinit[, which.max(logLikinit)]  
-    }
-    model@covariance <- vect2covparam(model@covariance, parinit)
-    model@parinit <- parinit
-    return(model)
-	}
   if (model@noise.flag) nugget.aux <- model@noise.var
   
 	
@@ -75,25 +65,28 @@ function(model) {
 	varinit.upper <- 10*max(varinit.upper, varinit.vario.upper)
 			
 	varinit.sim <- runif(n=ninit, min=1/2*varinit, max=3/2*varinit)       
-				
-		# take the best point				 
-  matrixinit <- rbind(matrixinit, varinit.sim)
-	logLikinit <- apply(matrixinit, 2, logLikFun, model)
-	parinit <- matrixinit[, which.max(logLikinit)]     
-		
-		# result
-	model@parinit <- as.numeric(parinit)
+					
+    # take the best point(s)				 
+	matrixinit <- rbind(matrixinit, varinit.sim)
+	fninit <- apply(matrixinit, 2, logLikFun, model)
+	selection <- sort(fninit, decreasing = TRUE, index.return = TRUE)$ix
+	selection <- selection[1:model@control$multistart]
+	parinit <- matrixinit[, selection, drop = FALSE]
+  # for one point : parinit <- matrixinit[, which.max(logLikinit)] 
 	
-	lp <- length(parinit)
-	var.init <- parinit[lp]
-	parinit <- parinit[1:(lp-1)]
-   	   	
-   	model@covariance <- vect2covparam(model@covariance, parinit)
-	model@covariance@sd2 <- var.init
+	lp <- nrow(parinit)
+	covinit <- list()
+	for (i in 1:model@control$multistart){
+    pari <- as.numeric(parinit[, i])
+	  covinit[[i]] <- vect2covparam(model@covariance, pari[1:(lp-1)])
+	  covinit[[i]]@sd2 <- pari[lp]
+	}
 	
-	model@lower <- c(lower, varinit.lower)
-	model@upper <- c(upper, varinit.upper)
-  	
-	return(model)
+	return(list(par = parinit, 
+	            value = fninit[selection], 
+	            cov = covinit,
+	            lower = c(lower, varinit.lower), 
+	            upper = c(upper, varinit.upper)))
+  
 }
 

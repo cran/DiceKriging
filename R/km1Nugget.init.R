@@ -77,27 +77,28 @@ function(model) {
 	sq.nugget.init.sim <- radius.sim*cos(angle.sim)      
 	sigma.init.sim <- radius.sim*sin(angle.sim)       
 				
-		# take the best point				 
+		# take the best point(s)				 
 	alphainit <- sigma.init.sim^2 / (sigma.init.sim^2 + sq.nugget.init.sim^2)
 	matrixinit <- rbind(matrixinit, alphainit)     
-	logLikinit <- apply(matrixinit, 2, logLikFun, model)
-	parinit <- matrixinit[, which.max(logLikinit)]     
-		
-		# result	
-	model@parinit <- as.numeric(parinit)
-	
-	lp <- length(parinit)
-	#nugget.init <- parinit[lp]
-	#var.init <- parinit[lp-1]
-	parinit <- parinit[1:(lp-1)]
-   	 
-	model@covariance <- vect2covparam(model@covariance, parinit)   
-	#model@covariance@sd2 <- var.init
-	#model@covariance@nugget <- nugget.init
-	
-  	model@lower <- c(lower, 0)	              
-	model@upper <- c(upper, model@control$upper.alpha)
-	
-	return(model)
+	fninit <- apply(matrixinit, 2, logLikFun, model)
+	selection <- sort(fninit, decreasing = TRUE, index.return = TRUE)$ix
+	selection <- selection[1:model@control$multistart]
+	parinit <- matrixinit[, selection, drop = FALSE]  
+	# for one point : parinit <- matrixinit[, which.max(logLikinit)] 
+	  
+	lp <- nrow(parinit)
+	covinit <- list()
+	for (i in 1:model@control$multistart){
+    pari <- as.numeric(parinit[, i])
+    covinit[[i]] <- vect2covparam(model@covariance, pari[1:(lp-1)])
+    covinit[[i]]@nugget <- pari[lp]
+    covinit[[i]]@sd2 <- pari[lp-1]
+	}
+  
+  return(list(par = parinit, 
+	            value = fninit[selection], 
+	            cov = covinit,
+	            lower = c(lower, 0), 
+	            upper = c(upper, model@control$upper.alpha)))
 }
 

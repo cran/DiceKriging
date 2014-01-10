@@ -30,10 +30,8 @@
 
 \note{ 
 \tabular{ll}{
- \tab 1. When constructing a \code{km} object with known parameters, note that the argument \code{y} (the output) is \cr
- \tab required in \code{km} even if it will not be used for simulation. \cr
- \tab 2. Sometimes, a small nugget effect is necessary to avoid numerical instabilities (see the ex. below).
- \cr
+ \tab 1. When constructing a \code{km} object with known parameters, note that the argument \code{y} (the output) is required in \code{km} even if it will not be used for simulation. \cr
+ \tab 2. Sometimes, a small nugget effect is necessary to avoid numerical instabilities (see the ex. below). \cr
 }
 
 }

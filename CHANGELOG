@@ -1,8 +1,18 @@
-## DiceKriging 1.5.3
+## DiceKriging 1.5.4
+
+## change / DiceKriging 1.5.3
+  * Implementation of a multistart option for the BFGS optimizer, allowing to perform several optimizations from different initial starting points.
+  * Bug corrected in 'drop.response', that prevented users from removing intercept in trend formulas.
+  * Bug corrected in method 'simulate': 'newdata=NULL' is now also possible when 'cond=TRUE'
+  * Bug corrected in method 'update' about power-exponential covariance function.
+  * Undesirable printing removed in kmEstimate
+  * Minor improvement in speed about initialization for the noise-free case, when an initial point is provided.
+  * test added about prediction: comparison with Ornstein-Uhlenbeck in 1D and Kriging with 'exp' covariance.
+
 
 ## change / DiceKriging 1.5.2
   * Non-ASCII parameters removed in two help files
-  * Help file of ScalingFun improved
+  * Help file of scalingFun improved
 
 ## change / DiceKriging 1.5.1
 

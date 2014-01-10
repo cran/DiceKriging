@@ -4,7 +4,7 @@ function(formula = ~1, design, response, covtype = "matern5_2",
          nugget = NULL, nugget.estim = FALSE, noise.var = NULL, 
          estim.method = "MLE", penalty = NULL, 
          optim.method = "BFGS", lower = NULL, upper = NULL,
-         parinit = NULL, control = NULL, gr = TRUE, 
+         parinit = NULL, multistart = 1, control = NULL, gr = TRUE, 
          iso = FALSE, scaling = FALSE, knots = NULL, kernel = NULL) {
 
   if (!is.null(kernel)){ 
@@ -120,12 +120,18 @@ function(formula = ~1, design, response, covtype = "matern5_2",
     if (length(upper) == 0) upper <- bounds$upper
   }
   
+  if ((multistart>1) && (optim.method=="gen")){
+    warning("The 'multistart' argument is not used when 'optim.method' is 'gen'.")
+    multistart <- 1
+  }
+  control$multistart <- multistart
   model@lower <- as.numeric(lower)
   model@upper <- as.numeric(upper)
   model@parinit <- as.numeric(parinit)
   
   if (optim.method == "BFGS") {
     if (length(control$pop.size) == 0) control$pop.size <- 20
+    control$pop.size <- max(control$pop.size, multistart)
     if (identical(control$trace, FALSE)) control$trace <- 0
     if ((length(control$trace) == 0) || (identical(control$trace, TRUE))) {
       control$trace <- 3

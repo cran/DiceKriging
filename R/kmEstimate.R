@@ -19,10 +19,13 @@ function(model, envir) {
     if (model@noise.flag) nugget <- model@noise.var
   }
   
+
   if (is.element(model@method, c("MLE", "PMLE"))){
     fn <- logLikFun
+    fnscale <- -1
   } else if (model@method=="LOO") {
     fn <- leaveOneOutFun
+    fnscale <- 1
   } 
 	if (model@gr==TRUE) {
 	  if (is.element(model@method, c("MLE", "PMLE"))){
@@ -36,20 +39,25 @@ function(model, envir) {
 	
 		# initialization: starting points and boundaries
   
-  model <- switch(case,
-    Default = kmNoNugget.init(model),
+  multistart <- model@control$multistart
+  # below: useful if someone calls directly kmEstimate
+  if (length(multistart)==0){
+    model@control$multistart <- multistart <- 1
+  }
+	
+  initList <- switch(case,
+    Default = kmNoNugget.init(model, fn, fnscale),
     Nugget = km1Nugget.init(model),
     Noisy = kmNuggets.init(model))
   
-	parinit <- model@parinit
-	lp <- length(parinit)
-  
-  lower <- model@lower
-  upper <- model@upper
+  lower <- model@lower <- as.numeric(initList$lower)
+	upper <- model@upper <- as.numeric(initList$upper)
+	parinit <- initList$par
+	lp <- nrow(parinit)
 	
 		# printing
 	control <- model@control
-	if (control$trace!=0) {
+  if (control$trace!=0) {
 		cat("\n")
 		cat("optimisation start\n")
 		cat("------------------\n")
@@ -66,16 +74,12 @@ function(model, envir) {
       cat("  - nugget : NO\n")
       cat("  - parameters lower bounds : ", lower, "\n")
    	  cat("  - parameters upper bounds : ", upper, "\n")
- 		  cat("  - best initial point among ", model@control$pop.size, " : ", parinit, "\n")
-		} else if (case=="Nugget") {
+		} else if (case=="Nugget") { 
       cat("  - nugget : unknown homogenous nugget effect \n")
       #if (!is.null(nugget)) cat("with initial value : ", nugget)
 		  cat("  - parameters lower bounds : ", lower[1:(lp-1)], "\n")
  		  cat("  - parameters upper bounds : ", upper[1:(lp-1)], "\n")
-		  cat("  - upper bound for alpha   : ", model@upper[lp],"\n")
-		  cat("  - best initial point among ", model@control$pop.size, " :\n")
- 		  cat("         coef.     : ", covparam2vect(model@covariance), "\n")
- 		  cat("         alpha.    : ", parinit[lp], "\n")
+		  cat("  - upper bound for alpha   : ", upper[lp],"\n")
 		} else if (case=="Noisy") {  # technically: includes the "known nugget" case
       if (model@covariance@nugget.flag) {
         cat("  - nugget :", model@covariance@nugget, "\n")
@@ -86,10 +90,8 @@ function(model, envir) {
 		  cat("  - parameters lower bounds : ", lower[1:(lp-1)], "\n")
  		  cat("  - parameters upper bounds : ", upper[1:(lp-1)], "\n")
  		  cat("  - variance bounds : ", c(lower[lp], upper[lp]), "\n")
- 		  cat("  - best initial point among ", model@control$pop.size, " :\n")
- 		  cat("          coef.     : ", covparam2vect(model@covariance), "\n")
- 		  cat("          variance  : ", model@covariance@sd2, "\n")
 		}
+    cat("  - best initial criterion value(s) : ", initList$value, "\n")
     if (model@optim.method=="BFGS") cat("\n")     
 	} # end printing
 	
@@ -102,22 +104,72 @@ function(model, envir) {
     if (length(control$REPORT)==0) {
       controlChecked$REPORT <- 1
     }
-    if (is.element(model@method, c("MLE", "PMLE"))){
-      fnscale <- -1
-    } else if (model@method=="LOO"){
-      fnscale <- 1
-    }
-    forced <- list(fnscale=fnscale)
-    
+
+    forced <- list(fnscale = fnscale)
     controlChecked[names(forced)] <- forced
     
-    o <- optim(par=parinit, fn=fn, gr=gr,
-    		  	method = "L-BFGS-B", lower = lower, upper = upper,
-    	  		control = controlChecked, hessian = FALSE, model, envir=envir)
-  }
-   
-  if (model@optim.method=="gen") {       
-    genoudArgs <- formals(genoud)
+    # multistart in parallel with foreach
+    multistart <- control$multistart
+    
+    if (multistart==1){
+      model@parinit <- parinit <- as.numeric(parinit[, 1])
+      model@covariance <- initList$cov[[1]]
+      o <- optim(par = parinit, fn = fn, gr = gr,
+                 method = "L-BFGS-B", lower = lower, upper = upper,
+                 control = controlChecked, hessian = FALSE, model, envir=envir)
+      model@control$convergence <- o$convergence
+    } else {
+      # multistart with foreach
+      if (requireNamespace("foreach", quietly = TRUE)){
+        olist <- foreach::"%dopar%"(foreach::foreach(i=1:multistart, 
+                                  .errorhandling='remove'), {
+          model@covariance <- initList$cov[[i]]
+          optim(par = parinit[, i], fn = fn, gr = gr,
+                method = "L-BFGS-B", lower = lower, upper = upper,
+                control = controlChecked, hessian = FALSE, model, envir=envir)
+      })
+      }
+    
+      # get the best result
+      bestValue <- Inf
+      bestIndex <- NA
+      vecValue <- c()
+      for (i in 1:multistart){
+        currentValue <- fnscale * olist[[i]]$value
+        vecValue <- c(vecValue, currentValue)
+        if (currentValue < bestValue) {
+          o <- olist[[i]]
+          bestValue <- currentValue
+          bestIndex <- i
+        }
+      } # end multistart
+    
+      model@covariance <- initList$cov[[bestIndex]]
+      parinit <- parinit[, bestIndex]
+      model@parinit <- as.numeric(parinit)
+      model@control$convergence <- o$convergence
+      
+      # we need to initiate a final optimization from the best point
+      # in order to have the correct intermediate variables stored in environnement 'envir'
+      controlChecked$maxit <- 0
+      controlChecked$trace <- 0
+      o <- optim(par = o$par, fn = fn, gr = gr,
+                 method = "L-BFGS-B", lower = lower, upper = upper,
+                 control = controlChecked, hessian = FALSE, model, envir=envir)
+    
+      if (control$trace!=0){
+        cat("\n")
+        cat("* The", multistart, "best values (multistart) obtained are:\n", vecValue, "\n")
+        cat("* The model corresponding to the best one (", bestValue, ") is stored. \n", sep="")
+      }
+    } # end multistart loop
+  } # end BFGS loop
+  
+  model@control$multistart <- multistart
+
+  
+  if ((model@optim.method=="gen") & (requireNamespace("rgenoud", quietly = TRUE))) {       
+    genoudArgs <- formals(rgenoud::genoud)
     commonNames <- intersect(names(genoudArgs), names(control))
     genoudArgs[commonNames] <- control[commonNames]
     if (length(control$print.level)==0) {
@@ -126,23 +178,18 @@ function(model, envir) {
       genoudArgs$print.level <- control$print.level
     }
     
-    if (is.element(model@method, c("MLE", "PMLE"))){
-      max.goal <- TRUE
-    } else if (model@method=="LOO") {
-      max.goal <- FALSE
-    }
-    forced <- list(fn=fn, nvars=length(parinit), max=max.goal, starting.values=parinit, 
+    forced <- list(fn=fn, nvars=length(parinit), max=(fnscale < 0), starting.values=parinit, 
             Domains=cbind(lower, upper), gr=gr, gradient.check=FALSE, boundary.enforcement=2, 
             hessian=TRUE, optim.method="L-BFGS-B", model=model, envir=envir)
        
     genoudArgs[names(forced)] <- forced
     genoudArgs$... <- NULL
        
-    o <- do.call(genoud, genoudArgs)   
+    o <- do.call(rgenoud::genoud, genoudArgs)   
     	
 	}
    
-  model@logLik <- o$value
+  model@logLik <- as.numeric(o$value)
   
   
 	if (model@method=="LOO"){
@@ -153,7 +200,7 @@ function(model, envir) {
 	  sigma2LOO <- envir$sigma2LOO
     sigma2.hat <- mean(errorsLOO^2/sigma2LOO)
     sigma.hat <- sqrt(sigma2.hat)
-	  model@covariance@sd2 <- sigma2.hat
+	  model@covariance@sd2 <- as.numeric(sigma2.hat)
 	  
     R <- envir$R
 	  T <- chol(R)
@@ -166,7 +213,7 @@ function(model, envir) {
 	    l <- lm(x ~ M-1)
 	    beta.hat <- as.numeric(l$coef)
 #       z <- backsolve(t(T), y - F%*%beta.hat, upper.tri=FALSE)
-	    model@trend.coef <-beta.hat
+	    model@trend.coef <- beta.hat
 	    Q <- qr.Q(qr(M))
 	    H <- Q %*% t(Q)
 	    z <- x - H %*% x
@@ -209,7 +256,7 @@ function(model, envir) {
 	  model@z <- as.numeric(z / s)
 	  model@M <- M / s
 		
-    param <- o$par
+    param <- as.numeric(o$par)
     lp <- length(param)
     alpha <- param[lp]
     model@covariance@sd2 <- alpha*v
@@ -225,9 +272,8 @@ function(model, envir) {
     model@z <- as.numeric(z)
     model@M <- M
     
-    param <- o$par
+    param <- as.numeric(o$par)
     lp <- length(param)
-    print(param)
 	  model@covariance@sd2 <- param[lp]
 	  model@covariance <- vect2covparam(model@covariance, param[1:(lp-1)])
     

@@ -11,7 +11,7 @@ km(formula=~1, design, response, covtype="matern5_2",
    coef.trend = NULL, coef.cov = NULL, coef.var = NULL,
    nugget = NULL, nugget.estim=FALSE, noise.var=NULL, estim.method="MLE",
    penalty = NULL, optim.method = "BFGS", lower = NULL, upper = NULL, 
-   parinit = NULL, control = NULL, gr = TRUE, 
+   parinit = NULL, multistart = 1, control = NULL, gr = TRUE, 
    iso=FALSE, scaling=FALSE, knots=NULL, kernel=NULL)
 }
 
@@ -31,9 +31,10 @@ km(formula=~1, design, response, covtype="matern5_2",
   \item{estim.method}{  a character string specifying the method by which unknown parameters are estimated. Default is \code{"MLE"} (Maximum Likelihood). At this stage, a beta version of leave-One-Out estimation (\code{estim.method="LOO"}) is also implemented for noise-free observations.}
   \item{penalty}{ (beta version) an optional list suitable for Penalized Maximum Likelihood Estimation. The list must contain the item \code{fun} indicating the penalty function, and the item \code{value} equal to the value of the penalty parameter. At this stage the only available \code{fun} is \code{"SCAD"}, and \code{covtype} must be \code{"gauss"}. Default is \code{NULL}, corresponding to (un-penalized) Maximum Likelihood Estimation.}
   \item{optim.method}{ an optional character string indicating which optimization method is chosen for the likelihood maximization. \code{"BFGS"} is the \code{optim} quasi-Newton procedure of package \code{stats}, with the method "L-BFGS-B". \code{"gen"} is the \code{genoud} genetic algorithm (using derivatives) from package \code{rgenoud} (>= 5.3.3). }
- \item{lower, }{ (see below) }
+  \item{lower, }{ (see below) }
   \item{upper}{ optional vectors containing the bounds of the correlation parameters for optimization. The default values are given by \code{\link{covParametersBounds}}. }
-   \item{parinit}{ an optional vector containing the initial values for the variables to be optimized over. If no vector is given, an initial point is generated as follows. For method \code{"gen"}, the initial point is generated uniformly inside the hyper-rectangle domain defined by \code{lower} and \code{upper}. For method \code{"BFGS"}, some points (see \code{control} below) are generated uniformly in the domain. Then the best point with respect to the likelihood (or penalized likelihood, see \code{penalty}) criterion is chosen. }
+  \item{parinit}{ an optional vector containing the initial values for the variables to be optimized over. If no vector is given, an initial point is generated as follows. For method \code{"gen"}, the initial point is generated uniformly inside the hyper-rectangle domain defined by \code{lower} and \code{upper}. For method \code{"BFGS"}, some points (see \code{control} below) are generated uniformly in the domain. Then the best point with respect to the likelihood (or penalized likelihood, see \code{penalty}) criterion is chosen. }
+  \item{multistart}{ an optional integer indicating the number of initial points from which running the BFGS optimizer. These points will be selected as the best \code{multistart} one(s) among those evaluated (see above \code{parinit}). The multiple optimizations will be performed in parallel provided that a parallel backend is registered (see package \code{foreach}).} 
    \item{control}{ an optional list of control parameters for optimization. See details below.}
    \item{gr}{ an optional boolean indicating whether the analytical gradient should be used. Default is \code{TRUE}.}
    \item{iso}{ an optional boolean that can be used to force a tensor-product covariance structure (see \code{\link{covTensorProduct-class}}) to have a range parameter common to all dimensions. Default is \code{FALSE}. Not used (at this stage) for the power-exponential type.}
@@ -145,6 +146,22 @@ contour(x.grid, y.grid, matrix(predicted.values.model2, n.grid, n.grid), 50,
 points(design.fact[,1], design.fact[,2], pch=17, cex=1.5, col="blue")
 par(mfrow=c(1,1))
 
+
+# (same example) how to use the multistart argument
+# -------------------------------------------------
+require(foreach)
+
+# below an example for a computer with 2 cores, but also work with 1 core
+
+nCores <- 2
+require(doParallel)
+cl <-  makeCluster(nCores) 
+registerDoParallel(cl)
+
+# kriging model 1, with 4 starting points
+m1_4 <- km(design=design.fact, response=y, multistart=4)
+
+stopCluster(cl)
 
 # -------------------------------
 # A 1D example with penalized MLE

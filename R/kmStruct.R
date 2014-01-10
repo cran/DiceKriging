@@ -309,14 +309,16 @@ setMethod("predict", "km",
 simulate.km <- function(object, nsim = 1, seed = NULL, newdata = NULL,
                         cond = FALSE, nugget.sim = 0, checkNames = TRUE, ...) {
 	
+  newdataMissing <- is.null(newdata)  
   if (!is.numeric(nugget.sim)) stop("'nugget.sim' must be a number")
   if (nugget.sim<0) stop("nugget.sim (homogenous to a variance) must not be negative")
   if (!is.logical(cond)) stop("'cond' must be TRUE/FALSE")
-  if ((!is.null(newdata)) && (checkNames)) {
+  if ((!newdataMissing) && (checkNames)) {
     newdata <- checkNames(X1 = object@X, X2 = newdata, X1.name = "the design", X2.name = "newdata")
   }
 
-  if (is.null(newdata)) {
+  
+  if (newdataMissing) {
     newdata <- object@X
     F.newdata <- object@F
     T.newdata <- object@T
@@ -349,7 +351,7 @@ simulate.km <- function(object, nsim = 1, seed = NULL, newdata = NULL,
     Tinv.Sigma21 <- backsolve(t(object@T), Sigma21, upper.tri = FALSE)     ## t(T22)^(-1) * Sigma21,  size  n x m
     y.trend.cond <- y.trend + t(Tinv.Sigma21) %*% object@z                 ## size m x 1
     
-    if (!is.null(newdata)) {
+    if (!newdataMissing) {
       Sigma11 <- Sigma
     } else Sigma11 <- t(object@T) %*% object@T	
     
@@ -437,7 +439,7 @@ update.km <- function(object,
           coef.cov <- NULL
           coef.var <- NULL
         }else{
-          if((TheClass == "covTensorProduct") | (TheClass == "covIso")) coef.cov <- object@covariance@range.val
+          if((TheClass == "covTensorProduct") | (TheClass == "covIso")) coef.cov <- covparam2vect(object@covariance)
           if((TheClass == "covAffineScaling") | (TheClass == "covScaling")) coef.cov <- object@covariance@eta
           
           coef.var <- object@covariance@sd2
