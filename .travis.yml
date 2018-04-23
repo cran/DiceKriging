@@ -1,0 +1,20 @@
+language: r
+r:
+  - oldrel
+  - release
+  - devel
+warnings_are_errors: true
+r_packages:
+  - rgenoud
+  - foreach
+  - doParallel
+  - testthat
+  - numDeriv
+  - covr
+os:
+  - linux
+  - osx
+#before_install:
+#- if [ "$TRAVIS_OS_NAME" = "osx" ] ; then sudo chown -R $(whoami) /usr/local ; brew update ; brew reinstall --force gcc48 --with-fortran; fi
+after_success:
+- Rscript -e 'covr::codecov()'
