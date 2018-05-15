@@ -1,13 +1,13 @@
 useDynLib(DiceKriging) 
 
 import(methods)
-importFrom("graphics", plot)
-importFrom("stats", predict)
-importFrom("stats", logLik)
-importFrom("stats", coef)
-importFrom("stats", coefficients)
-importFrom("stats", simulate)
-importFrom("stats", update)
+importFrom("graphics", "abline", "lines", "matplot", "par", "plot")
+importFrom("stats", "as.formula", "dist", "lm", "model.matrix",
+     "optim", "qnorm", "qqline", "qqnorm", "qt", "quantile",
+     "reformulate", "rnorm", "runif", "sd", "terms", "var",
+     "predict", "logLik", "coef", "coefficients", "simulate", "update")
+importFrom("utils", "unstack")
+
 
 ## S4
 exportClasses(covTensorProduct, covIso, covScaling, covKernel, km, covAffineScaling, covUser)
@@ -25,6 +25,7 @@ S3method(predict, km)
 export(branin, 
        camelback, 
        checkNames,
+       checkNamesList,
        computeAuxVariables,
        covStruct.create,
        drop.response,

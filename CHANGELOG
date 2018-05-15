@@ -1,9 +1,16 @@
-## DiceKriging 1.5.5
+## DiceKriging 1.5.6
+## change / DiceKriging 1.5.5
+  
+  * Verification of names consistency in scaling, between knots and design [Thanks to Yann Richet]
+  * A clear error message is returned if package 'rgenoud' is not found [Thanks to Clement Walter]
+  * Multistart now accounts for failed results [Thanks to David Ojeida]
+  * Correction of the doc of 'predict.km' for Tinv.c (transpose was missing in the previous version) [Thanks to Hao Wang]
+  * Modification of the NAMESPACE to fit with new CRAN requirements
 
 ## change / DiceKriging 1.5.4
   * Deletion of the beta version of the replacement method 'coef<-', in order to avoid conflicts with GPlab
   * Correction of a NOTE in CRAN Package Check Results: Registration of S3 methods for 'logLik.km', 'plot.km', 'predict.km'
-  * Bug corrected about the usage of 'diag(vn)', 'diag(noise.var)' when the dimension is 1.
+  * Bug corrected about the usage of 'diag(vn)', 'diag(noise.var)' when the dimension is 1 [Thanks to Sébastien Marmin]
 
 ## change / DiceKriging 1.5.3
   * Implementation of a multistart option for the BFGS optimizer, allowing to perform several optimizations from different initial starting points.

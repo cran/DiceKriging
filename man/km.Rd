@@ -338,31 +338,31 @@ close.screen(all = TRUE)
 # ----------------------------------------------------------
 
 f11_xiong <- function(x){ 
-return( sin(30*(x - 0.9)^4)*cos(2*(x - 0.9)) + (x - 0.9)/2)
+return( sin(30 * (x - 0.9)^4) * cos(2 * (x - 0.9)) + (x - 0.9) / 2)
 }
 
-t <- seq(0,1,,300)
+t <- seq(0, 1, , 300)
 f <- f11_xiong(t)
 
-plot(t,f,type="l", ylim=c(-1,0.6), lwd=2)
+plot(t, f, type = "l", ylim = c(-1,0.6), lwd = 2)
 
-doe <- data.frame(x=seq(0,1,,20))
+doe <- data.frame(x = seq(0, 1, , 20))
 resp <- f11_xiong(doe)
 
-knots <- list(  c(0,0.5,1) ) 
+knots <- list(x = c(0, 0.5, 1)) 
 eta <- list(c(15, 2, 0.5))
-m <- km(design=doe, response=resp, scaling=TRUE, gr=TRUE, 
-knots=knots, covtype="matern5_2",  coef.var=1, coef.trend=0)
+m <- km(design = doe, response = resp, scaling = TRUE, gr = TRUE, 
+knots = knots, covtype = "matern5_2",  coef.var = 1, coef.trend = 0)
 
-p <- predict(m, data.frame(x=t), "UK")
+p <- predict(m, data.frame(x = t), "UK")
 
-plot(t, f, type="l", ylim=c(-1,0.6), lwd=2)
+plot(t, f, type = "l", ylim = c(-1, 0.6), lwd = 2)
 
-lines(t, p$mean, col="blue", lty=2, lwd=2)
-lines(t, p$mean + 2*p$sd, col="blue")
-lines(t, p$mean - 2*p$sd,col="blue")
+lines(t, p$mean, col = "blue", lty = 2, lwd = 2)
+lines(t, p$mean + 2 * p$sd, col = "blue")
+lines(t, p$mean - 2 * p$sd, col = "blue")
 
-abline(v=knots[[1]], lty=2, col="green")
+abline(v = knots[[1]], lty = 2, col = "green")
 
 
 # -----------------------------------------------------
