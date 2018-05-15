@@ -6,7 +6,7 @@ require("testthat")
 
 set.seed(1)
 
-test_that.km <- function(model, trend.coef=NULL, covariance.sd2=NULL, covariance.range.val=NULL, covariance.nugget=NULL, covariance.eta=NULL, precision=1e-6) {
+test_that.km <- function(model, trend.coef=NULL, covariance.sd2=NULL, covariance.range.val=NULL, covariance.nugget=NULL, covariance.eta=NULL, precision=1e-5) {
 
     if (!is.null(trend.coef))
         test_that(desc=paste0("Check kriging trend: ",model@trend.coef," == ",trend.coef),expect_true(max(abs((model@trend.coef - trend.coef)/trend.coef)) < precision))
