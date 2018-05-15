@@ -250,8 +250,9 @@ setMethod("show",
               eta.names <- paste("eta", "(", object@var.names[i], ")", sep = "")
               param.names <- c(eta.names, knots.names)
               param.names <- formatC(param.names, width = 12)
-              tab <- t(formatC(cbind(object@eta[[i]], object@knots[[i]]), width = 10, digits = 4, format = "f", flag = " "))
-              n.i <- length(object@knots[[i]])
+              name.i <- object@var.names[i]
+              tab <- t(formatC(cbind(object@eta[[name.i]], object@knots[[name.i]]), width = 10, digits = 4, format = "f", flag = " "))
+              n.i <- length(object@knots[[name.i]])
               dimnames(tab) <- list(param.names, rep("", n.i))
               print(tab, quote=FALSE)
             }

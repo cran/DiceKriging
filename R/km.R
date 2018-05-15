@@ -36,6 +36,10 @@ function(formula = ~1, design, response, covtype = "matern5_2",
   isCov <- length(coef.cov) != 0
   isVar <- length(coef.var) != 0
   
+  if ((scaling) & (length(knots) > 0)) {
+    knots <- checkNamesList(X1 = X, l2 = knots)
+  }
+  
   if ((isTrend && isCov && isVar) || (covtype == "covUser")) {
     known.param <- "All"
     nugget.estim <- FALSE
