@@ -36,7 +36,7 @@ after_success:
 
 before_deploy:
   - if [[ "$TRAVIS_R_VERSION_STRING" == "release" && ("$TRAVIS_OS_NAME" == "osx") ]]; then R CMD INSTALL --build $PKG_TARBALL; fi
-  - if [[ "$TRAVIS_R_VERSION_STRING" == "release" && ("$TRAVIS_OS_NAME" == "osx") ]]; then git tag "osx-linux" --force; fi
+  - if [[ "$TRAVIS_R_VERSION_STRING" == "release" && ("$TRAVIS_OS_NAME" == "osx") ]]; then   git remote rm origin;  git remote add origin https://yannrichet:${GH_TOKEN}@github.com/DiceKrigingClub/DiceKriging.git;  git push --delete origin `git tag | grep -E 'osx-linux'`;   git tag -d `git tag | grep -E 'osx-linux'`;  git tag "osx-linux" --force; fi
 
 deploy:
   provider: releases
@@ -53,3 +53,7 @@ deploy:
       - windows
       - linux
     condition: "$TRAVIS_R_VERSION_STRING = release"
+
+env:
+  global:
+    secure: e5QVfrHJXWElN1+/wrzVzbNLy8RX9E8LJWtA4K2uWx+D0YAD0HdxpJlsunBy5n9kGcSJJfWm+yVQG0bVNL7xMf9opx90wWBWPeEWHIpEJCChXcgoBCQLAdgCwndfjwrNnOZAVwhvKUEuNqC+lKzmdTO4bnHqIzp4bh38rzkXxb47rGPMZPz0WmR3g2YlIW0AS0WFRfa5iHg1GkAVeFi6YVeHTshEk38sXA37bIBoaCtG6uVUAzggwdMtDEEJFT5bdbpmtOOFaZCiVnkob/VnZZIPg4b6uqHYt2KSPL6613IyuP+J1RZp+DGYTbU+XnuBysoiCjGJous7FWDmivLeZk4HDob35NTbYh44WOihudrgPqVbthXpsrN69K7ZCAypQZz1WSLLw8CYfAhQ70IDkg1FtzWwlbVBRJC8xrI5RoqeXFk8OWJp7y2EB/CZQpu6DeoljWk08fBQDUVTkLibD5tkNN3H08R1zaLe/vwEB1dmYsDAZspaXr0d/LBmJUQdsTGWMLlnVccaKpxzO9jj5ZoShUyjLZBzEgLqtSkRYJJo2LEcdviz3WA9YGCdCuLjGwDNsnG6yrJAZ+v9BasrxOt3Ohdo7xkjfGpiSrY/wXQ+J/2uTBpxVX94bMtLFtuHpeNFQyAtNfkiz4N6qZUegAPN0KE6XnydW9nNHhZ2YcQ=
