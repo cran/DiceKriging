@@ -6,6 +6,7 @@
   * Multistart now accounts for failed results [Thanks to David Ojeida]
   * Correction of the doc of 'predict.km' for Tinv.c (transpose was missing in the previous version) [Thanks to Hao Wang]
   * Modification of the NAMESPACE to fit with new CRAN requirements
+  * Add support for scaling/warping with zero nodes (then equivalent to regular kriging without scaling)
 
 ## change / DiceKriging 1.5.4
   * Deletion of the beta version of the replacement method 'coef<-', in order to avoid conflicts with GPlab

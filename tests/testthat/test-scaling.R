@@ -26,4 +26,21 @@ set.seed(12)
 # kriging model 1 : matern5_2 covariance structure, no trend, no nugget effect
 m2 <- km(design=design.fact, response=y,control=list(trace=FALSE),scaling=TRUE, knots = list(c(0,1),c(0,1),c(0,.5,1)))
 
-test_that.km(m2,trend.coef = 127.2259,covariance.sd2 = 85424.77)
+test_that.km(m2,trend.coef = 127.2252,covariance.sd2 = 85424.41, precision=1e-3)
+
+
+
+context("Checking km scaling with 1 node (not passing with DiceKriging 1.5-4)")
+
+design.fact <- matrix(runif(1000),ncol=2)
+y <- apply(design.fact, 1, branin)
+
+set.seed(123)
+m_noScaling <- km(design=design.fact, response=y,scaling=F,control=list(trace=FALSE))
+
+set.seed(123)
+m_scaling1 <- km(design=design.fact, response=y,scaling=T,knots=list(x1=0,x2=0),control=list(trace=FALSE))
+
+# Check that 1/eta ~ theta
+test_that(desc="scaling:1/eta ~ theta",expect_true(max(abs(m_noScaling@covariance@range.val - 1/unlist(m_scaling1@covariance@eta))) < 0.1))
+
