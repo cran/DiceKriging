@@ -11,27 +11,14 @@ It contains the latest sources, possibly some supplement of stable CRAN release.
 Installation
 ------------
 
-You can install the standard (CRAN) version of the code:
-
-```
-install.packages("DiceKriging")
-```
+You can install the standard (CRAN) version of the code: `install.packages("DiceKriging")`
 
 You can install the latest (this repository) version of the code:
 
   * using pre-built packages:
-    * Windows:
-```
-install.packages("https://github.com/DiceKrigingClub/DiceKriging/releases/download/windows/DiceKriging_1.5.6.zip")
-```
-    * Linux:
-```
-install.packages("https://github.com/DiceKrigingClub/DiceKriging/releases/download/linux/DiceKriging_1.5.6.tar.gz")
-```
-    * OSX:
-```
-install.packages("https://github.com/DiceKrigingClub/DiceKriging/releases/download/osx/DiceKriging_1.5.6.tgz")
-```
+    * Windows: `install.packages("https://github.com/DiceKrigingClub/DiceKriging/releases/download/windows/DiceKriging_1.5.6.zip")`
+    * Linux: `install.packages("https://github.com/DiceKrigingClub/DiceKriging/releases/download/linux/DiceKriging_1.5.6.tar.gz")`
+    * OSX: `install.packages("https://github.com/DiceKrigingClub/DiceKriging/releases/download/osx/DiceKriging_1.5.6.tgz")`
   * or using the `devtools` R package (assuming you have C compiler installed):
 ```
 install.packages("devtools") # Install devtools, if you haven't already.
