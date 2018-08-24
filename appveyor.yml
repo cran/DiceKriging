@@ -1,3 +1,4 @@
+# Download script file from GitHub
 init:
   ps: |
         $ErrorActionPreference = "Stop"
@@ -7,6 +8,10 @@ install:
   ps: Bootstrap
 
 # Adapt as necessary starting from here
+branches:
+  only:
+    - master
+skip_tags: true
 
 build_script:
   - travis-tool.sh install_deps
@@ -20,19 +25,36 @@ on_failure:
 
 artifacts:
   - path: '*.Rcheck\**\*.log'
-    name: Logs
+    name: log
 
   - path: '*.Rcheck\**\*.out'
-    name: Logs
+    name: log
 
   - path: '*.Rcheck\**\*.fail'
-    name: Logs
+    name: log
 
   - path: '*.Rcheck\**\*.Rout'
-    name: Logs
+    name: log
 
   - path: '\*_*.tar.gz'
-    name: Bits
+    name: src
 
   - path: '\*_*.zip'
-    name: Bits
+    name: bin
+    type: zip
+    
+before_deploy:
+     - git tag %VERSION_RELEASE%
+deploy:
+  provider: GitHub
+  release: windows
+  auth_token:
+    secure:  DAGNQm9WOY/5YmstALy9O3oJ8UE9b0BRjHZtcy977Tp1pOTv5soBrnK2B6DQVetL
+  artifact: bin
+  draft: false
+  prerelease: false
+  force_update: true
+  on:
+    branch:
+      master
+
