@@ -42,7 +42,7 @@ deploy:
   provider: releases
   name: "osx-linux"
   target_commitish: $TRAVIS_COMMIT
-  tag_name: "osx-linux"
+  tag_name: $TRAVIS_TAG
   api_key:
     secure: f+1Pq8slKBREBY0pW3FrIDuZxtqSD9UTQv+7g6nX0R1v6i2ZC5w6UylalsNOUS5pqoQc8mcHvl56Kwxz3avBR17lzPNnAIWBrSphLw9I6jVcn1oeQcM4IlFeM6Cht0XjE9oi9rzs2xu/Tgx1oCcHPgnBgFwK0o/xMq7gbm5AstLlPr7takISzc/3X1pRDAF52o6TuaPaPvntFR+UcOpv5jpJMk3TONcGZvjfH8AgsIX4ZBE5Tvoeef+sl8XkHIHitJGBQvHn87ps23C4+m9FkjwjoRMJei5BrAJBHZ4Pg0vTeMeIs2e0T0NQ0gVNUsWOnHbcUPMBxLK33zM5LXCj8ncA3JxaiK17B/uaZ1HLS65q5KDqjRAgGHZ1pZ6Fu+FXMMXzk1GyanR3+oo1+ZB1SY7McZqvbVetohkBxEshFvQK9AAVRqfp0rPwv7DPhtgBQCCdPZRmITrb5cB9o0bAoCsARNSvaBU6eagEdx7vo0xgsFR9aPer0KNqZo9Zz1hDEsIxWFz1ExNELXdsAlwacTLYRtQXShMiWlqp9vWApfKkDwzstiypZCdjHYGqcRi9e2POx2ZCVC5R+3s/VTCTzzAlmLF0MhDFkLScM0MDf1O4s4rG3xYBqGeyxVncq4q9ADHr/7ud3FvaInMlBHYqoMMKCqcv2uKSqZHkLGorx7Q=
   file_glob: true
@@ -50,8 +50,9 @@ deploy:
   skip_cleanup: true
   overwrite: true
   on:
+    tags: true
     branch: master
     except: 
       - windows
       - linux
-    condition: "$TRAVIS_R_VERSION_STRING = release"
+    condition: "$TRAVIS_R_VERSION_STRING = release & $TRAVIS_OS_NAME = osx"
