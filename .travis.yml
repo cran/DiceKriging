@@ -36,6 +36,7 @@ after_success:
 
 before_deploy:
   - if [[ "$TRAVIS_R_VERSION_STRING" == "release" && ("$TRAVIS_OS_NAME" == "osx") ]]; then R CMD INSTALL --build $PKG_TARBALL; fi
+  # next line will allow to deploy in an existing release (here osx-linux). Before you need to put env: global: secure: XXX by running 'travis encrypt GH_TOKEN=<my github password> --add' from inside cloned repository
   - if [[ "$TRAVIS_R_VERSION_STRING" == "release" && ("$TRAVIS_OS_NAME" == "osx") ]]; then   git remote rm origin;  git remote add origin https://yannrichet:${GH_TOKEN}@github.com/DiceKrigingClub/DiceKriging.git;  git push --delete origin `git tag | grep -E 'osx-linux'`;   git tag -d `git tag | grep -E 'osx-linux'`;  git tag "osx-linux" --force; fi
 
 deploy:
