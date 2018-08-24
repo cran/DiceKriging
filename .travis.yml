@@ -49,5 +49,7 @@ deploy:
   overwrite: true
   on:
     branch: master
-    except: windows
+    except: 
+      - windows
+      - linux
     condition: "$TRAVIS_R_VERSION_STRING = release"
