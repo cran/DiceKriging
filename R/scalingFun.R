@@ -70,25 +70,12 @@ scalingFun1d.inside <- function(x, knots, eta){
     ind=1
   }
   
-  ## BUG fix for versions > 1.2. 'rightmost.closed'
-  ## must be set to TRUE
-  inter <- findInterval(x = xsorted, vec = knots,
-                        rightmost.closed = TRUE)
-  
-  inter <- factor(inter, levels = 1:(nKnots-1))
-  
-  ## iCuts is of length nKnot
-  ## the first and last element of 'iCuts' are 0 and  n
-  iCuts <- as.numeric(tapply(xsorted, inter, length))
-  iCuts[is.na(iCuts)] <- 0
-  iCuts <- c(0, cumsum(iCuts))
   scale <- rep(0, n)
   
   ## cat("Calling C\n")
   res <- .C("Scale",
             n = as.integer(n),
             nKnots = as.integer(nKnots),
-            iCuts = as.integer(iCuts),  
             x = as.double(xsorted), 
             knots = as.double(knots),
             eta = as.double(eta),

@@ -39,7 +39,7 @@ set.seed(123)
 m_noScaling <- km(design=design.fact, response=y,scaling=F,control=list(trace=FALSE))
 
 set.seed(123)
-m_scaling1 <- km(design=design.fact, response=y,scaling=T,knots=list(x1=0,x2=0),control=list(trace=FALSE))
+m_scaling1 <- km(design=design.fact, response=y,scaling=T,knots=list(X1=0,X2=0),control=list(trace=FALSE))
 
 # Check that 1/eta ~ theta
 test_that(desc="scaling:1/eta ~ theta",expect_true(max(abs(m_noScaling@covariance@range.val - 1/unlist(m_scaling1@covariance@eta))) < 0.1))
