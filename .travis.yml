@@ -52,4 +52,4 @@ deploy:
     except: 
       - windows
       - linux
-    condition: "$TRAVIS_R_VERSION_STRING = release & $TRAVIS_OS_NAME = osx"
+    condition: "$TRAVIS_R_VERSION_STRING = release"
