@@ -431,6 +431,7 @@ update.km <- function(object,
         if (is.null(kmcontrol$optim.method)) kmcontrol$optim.method <- object@optim.method 
         if (length(kmcontrol$optim.method) == 0) kmcontrol$optim.method <- "BFGS"
         if (is.null(kmcontrol$control)) kmcontrol$control <- object@control
+	if (is.null(kmcontrol$multistart)) kmcontrol$multistart <- object@control$multistart
         if(length(object@gr) == 0) object@gr <- TRUE
         knots <- NULL; if(TheClass == "covScaling") knots <- object@covariance@knots
         
