@@ -43,5 +43,22 @@ m_scaling1 <- km(design=design.fact, response=y,scaling=T,knots=list(X1=0,X2=0),
 
 # Check that 1/eta ~ theta
 test_that(desc="scaling:1/eta ~ theta",expect_true(max(abs(m_noScaling@covariance@range.val - 1/unlist(m_scaling1@covariance@eta))) < 0.1))
-# TODO : add test without parameter estimation, by comparing prediction 
-# with standard Kriging and scaling with 1 knot (eta = 1/theta)
+
+           
+
+context("Checking without parameter estimation, by comparing prediction with standard Kriging and scaling with 1 knot (eta = 1/theta)")
+
+design.fact <- matrix(runif(1000),ncol=2)
+y <- apply(design.fact, 1, branin)
+
+m_noScaling <- km(design=design.fact, response=y,scaling=F,coef.var = 1, coef.cov = c(.1,.1),control=list(trace=FALSE))
+
+# Force 1/eta = theta (exactly)
+m_scaling1 <- km(design=design.fact, response=y,scaling=T,coef.var = 1, coef.cov = c(10,10),knots=list(X1=0,X2=0),control=list(trace=FALSE))
+
+pred_noScaling = predict(m_noScaling,newdata=matrix(.5,ncol=2),type="UK")
+pred_scaling1 = predict(m_scaling1,newdata=matrix(.5,ncol=2),type="UK")
+
+test_that(desc="scaling:predict identical when 1/eta = theta",expect_true(pred_noScaling$mean == pred_scaling1$mean))
+test_that(desc="scaling:predict identical when 1/eta = theta",expect_true(pred_noScaling$sd == pred_scaling1$sd))
+
