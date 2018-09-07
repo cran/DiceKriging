@@ -78,7 +78,8 @@ function(covtype, d, known.covparam, var.names, coef.cov=NULL, coef.var=NULL, nu
 	} else {
     
     eta.flag <- (length(coef.cov)>0)
-		
+    if (eta.flag) eta <- coef.cov
+
     for (i in 1:length(knots)) {
       if (is.unsorted(knots[[i]])) {        
         ordKnots <- sort(knots[[i]], index.return = TRUE)
