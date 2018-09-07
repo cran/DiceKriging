@@ -43,4 +43,5 @@ m_scaling1 <- km(design=design.fact, response=y,scaling=T,knots=list(X1=0,X2=0),
 
 # Check that 1/eta ~ theta
 test_that(desc="scaling:1/eta ~ theta",expect_true(max(abs(m_noScaling@covariance@range.val - 1/unlist(m_scaling1@covariance@eta))) < 0.1))
-
+# TODO : add test without parameter estimation, by comparing prediction 
+# with standard Kriging and scaling with 1 knot (eta = 1/theta)
