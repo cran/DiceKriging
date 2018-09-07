@@ -54,11 +54,11 @@ y <- apply(design.fact, 1, branin)
 m_noScaling <- km(design=design.fact, response=y,scaling=F,coef.var = 1, coef.cov = c(.1,.1),control=list(trace=FALSE))
 
 # Force 1/eta = theta (exactly)
-m_scaling1 <- km(design=design.fact, response=y,scaling=T,coef.var = 1, coef.cov = c(10,10),knots=list(X1=0,X2=0),control=list(trace=FALSE))
+m_scaling1 <- km(design=design.fact, response=y,scaling=T,coef.var = 1, coef.cov = list(X1=10,X2=10),knots=list(X1=0,X2=0),control=list(trace=FALSE))
 
 pred_noScaling = predict(m_noScaling,newdata=matrix(.5,ncol=2),type="UK")
 pred_scaling1 = predict(m_scaling1,newdata=matrix(.5,ncol=2),type="UK")
 
-test_that(desc="scaling:predict identical when 1/eta = theta",expect_true(pred_noScaling$mean == pred_scaling1$mean))
-test_that(desc="scaling:predict identical when 1/eta = theta",expect_true(pred_noScaling$sd == pred_scaling1$sd))
+test_that(desc="scaling:predict identical when 1/eta = theta",expect_true(abs(pred_noScaling$mean - pred_scaling1$mean)<1E-5))
+test_that(desc="scaling:predict identical when 1/eta = theta",expect_true(abs(pred_noScaling$sd == pred_scaling1$sd)<1E-5))
 
