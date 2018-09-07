@@ -21,8 +21,8 @@ checkNames <- function(X1, X2, X1.name="X1", X2.name="X2") {
     colnames(X2) <- colnames(X1)
   } else {
     if (length(nm2) < d) stop("not enough names (ties?) found in ", X2.name)
-    if (!all(nm2 %in% nm1)) stop("one name in ", X2.name, " is not in ", X1.name)
-    if (!all(nm1 %in% nm2)) stop("one name in ", X1.name, " is not in ", X2.name)
+    if (!all(nm2 %in% nm1)) stop("one name in ", X2.name, " (", paste(collapse=" ",nm2), ") is not in ", X1.name," (", paste(collapse=" ",nm1), ")")
+    if (!all(nm1 %in% nm2)) stop("one name in ", X1.name, " (", paste(collapse=" ",nm1), ") is not in ", X2.name," (", paste(collapse=" ",nm2), ")")
     ind <- 1:length(nm1)
     names(ind) <- nm2
     X2 <- X2[, ind[nm1], drop = FALSE]
@@ -54,8 +54,8 @@ checkNamesList <- function(X1, l2, X1.name = "X1", l2.name = "l2") {
     names(l2) <- colnames(X1)
   } else {
     if (length(nm2) < d) stop("not enough names (ties?) found in ", l2.name)
-    if (!all(nm2 %in% nm1)) stop("one name in ", l2.name, " is not in ", X1.name)
-    if (!all(nm1 %in% nm2)) stop("one name in ", X1.name, " is not in ", l2.name)
+    if (!all(nm2 %in% nm1)) stop("one name in ", l2.name, " (", paste(collapse=" ",nm2), ") is not in ", X1.name," (", paste(collapse=" ",nm1), ")")
+    if (!all(nm1 %in% nm2)) stop("one name in ", X1.name, " (", paste(collapse=" ",nm1), ") is not in ", l2.name," (", paste(collapse=" ",nm2), ")")
     newlist <- list()
     for (i in 1:d){
       newlist[[i]] <- l2[[nm1[i]]]
