@@ -431,6 +431,7 @@ update.km <- function(object,
         if (is.null(kmcontrol$optim.method)) kmcontrol$optim.method <- object@optim.method 
         if (length(kmcontrol$optim.method) == 0) kmcontrol$optim.method <- "BFGS"
         if (is.null(kmcontrol$control)) kmcontrol$control <- object@control
+	if (is.null(kmcontrol$multistart)) kmcontrol$multistart <- object@control$multistart
         if(length(object@gr) == 0) object@gr <- TRUE
         knots <- NULL; if(TheClass == "covScaling") knots <- object@covariance@knots
         
@@ -460,7 +461,8 @@ update.km <- function(object,
                        covtype = object@covariance@name, 
                        coef.trend = coef.trend, coef.cov = coef.cov, coef.var = coef.var,
                        nugget=nugget,nugget.estim=nugget.estim,
-                       noise.var = object@noise.var, penalty = kmcontrol$penalty,optim.method = kmcontrol$optim.method,
+                       noise.var = object@noise.var, penalty = kmcontrol$penalty,
+		       optim.method = kmcontrol$optim.method, multistart = kmcontrol$multistart,
                        lower = object@lower, upper = object@upper,
                        control = kmcontrol$control,gr = object@gr,
                        iso =     (TheClass == "covIso"),
