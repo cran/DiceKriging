@@ -1,8 +1,8 @@
 language: r
 r:
-  - oldrel
+#  - oldrel
   - release
-  - devel
+#  - devel
 branches:
   only:
     master
