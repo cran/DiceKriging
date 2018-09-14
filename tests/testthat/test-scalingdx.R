@@ -10,9 +10,11 @@ f = function(x) scalingFun1d(x,c(0,.5,1),c(10.5,.5,1.75))
 dfdx_a = function(x) scalingFun1d.dx(x,c(0,.5,1),c(10.5,.5,1.75))
 dfdx_num = function(x) numDeriv::grad(function(xx) scalingFun1d(matrix(xx,nrow=1), c(0,.5,1),c(10.5,.5,1.75)),x)
 
-for (x in runif(10))
-  test_that(desc=paste0("numerical derivative equals analytical at x=",x),expect_true(abs(dfdx_a(x) - dfdx_num(x)) < 1E-3))
-
+for (x in runif(10)) {
+  dfdx_ax = dfdx_a(x)
+  dfdx_numx = dfdx_num(x)
+  test_that(desc=paste0("numerical derivative equals analytical at x=",x," : ",dfdx_ax,"!=", dfdx_numx),expect_true(abs(dfdx_ax - dfdx_numx) < 1E-3))
+}
 
 
 
