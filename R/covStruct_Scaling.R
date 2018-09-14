@@ -39,7 +39,7 @@ setClass("covScaling",
              } else if (!all(sapply(object@knots, is.numeric))) {
                return("the knots must be numeric")
              } else if ((!all(names.knots%in%object@var.names)) || (!all(object@var.names%in%names.knots))) {
-               return("mismatch between the names of knots and input variables")
+               return(paste0("mismatch between the names of knots (",paste0(names.knots,collapse=","),") and input variables (",paste0(object@var.names,collapse=","),")"))
              }
              for (i in 1L:n.knots) {
                knots.i <- object@knots[[i]]
@@ -138,12 +138,13 @@ setMethod("vect2covparam",
               knots.n <- sapply(object@knots, length)
               ind <- rep(names(knots.n), times=knots.n)
               df <- data.frame(values=param, ind=ind)
-              eta <- unstack(df)
-              if(length(eta)!=object@d) {
-                  t.eta=as.list(t(eta))
-                  names(t.eta) <- rownames(eta)
-                  object@eta = t.eta
-              } else object@eta = eta
+                  object@eta <- unstack(df)
+                  if (is.data.frame(object@eta))
+                      if (ncol(object@eta) != object@d || (ncol(object@eta) == 1 && nrow(object@eta) == 1))
+                          object@eta = as.data.frame(t(object@eta))
+
+                  if (is.null(names(object@eta)))
+                      names(object@eta) <- names(object@knots)
             }
             return(object)
           }
@@ -192,6 +193,24 @@ setMethod("paramSample",
           }
 )
 
+covMatrixDerivative.dx.covTensorProduct <- function(object, X, C0, k) {
+    ## X  : n x d
+    n <- nrow(X)
+    d <- ncol(X)
+
+    ## beware that the index k  starts at 0 in C language
+
+    param <- covparam2vect(object)
+
+    out <- .C("C_covMatrixDerivative_dx",
+              as.double(X), as.integer(n), as.integer(d),
+              as.double(param), as.character(object@name),
+              as.integer(k), as.double(C0),
+              ans = double(n * n),
+              PACKAGE="DiceKriging")
+
+    return(matrix(out$ans, n, n))
+}
 
 
 envir.covScaling <- new.env()
@@ -233,6 +252,28 @@ setMethod("covMatrixDerivative",
               stop("Wrong value of k")
             }
             return(dC)
+          }
+)
+
+setMethod("covVector.dx", "covScaling",
+          function(object, x, X, c) {
+              gradfx = array(NaN,length(x))
+              # gradfx_ref = array(NaN,length(x))
+              for (i in 1:length(x)) {
+                  # gradfx_ref[i] = numDeriv::grad(function(xx) scalingFun(matrix(xx,nrow=1), knots=object@knots, eta=object@eta)[i],x[i])
+                  name.i <- object@var.names[i]
+                  gradfx[i] = scalingFun1d.dx(x[i], knots=object@knots[[name.i]], eta=object@eta[[name.i]])
+                  # print(gradfx[i])
+              }
+              object.covTensorProduct <- as(extract.covIso(object), "covTensorProduct")
+              fx <- scalingFun(matrix(x,nrow=1), knots=object@knots, eta=object@eta)
+              fX <- scalingFun(X, knots=object@knots, eta=object@eta)
+              dk.dx = covVector.dx.covTensorProduct(object=as(object.covTensorProduct, "covTensorProduct"), x=fx, X=fX, c=c)
+              #(g o f)' = f' * (g' o f)
+              for (i in 1:length(x)) {
+                  dk.dx[,i] = gradfx[i] * dk.dx[,i]
+              }
+              return(dk.dx)
           }
 )
 
