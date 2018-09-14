@@ -1,5 +1,6 @@
 \name{checkNames}
 \alias{checkNames}
+\alias{checkNamesList}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Consistency test between the column names of two matrices
 }
@@ -8,12 +9,15 @@ Tests if the names of a second matrix are equal to a given matrix up to a permut
 }
 \usage{
 checkNames(X1, X2, X1.name = "X1", X2.name = "X2")
+checkNamesList(X1, l2, X1.name = "X1", l2.name = "l2")
 }
 \arguments{
   \item{X1}{a matrix containing column names.}
   \item{X2}{a matrix containing the same number of columns.}
+  \item{l2}{a list with length \code{ncol(X1)}.}
   \item{X1.name}{, }
-  \item{X2.name}{optional names for the matrix X1 and X2 theirselves (useful for error messages).}
+  \item{X2.name}{optional names for the matrix \code{X1} and \code{X2} theirselves (useful for error messages).}
+  \item{l2.name}{optional names for \code{l2}.}
 }
 
 \details{
@@ -45,6 +49,10 @@ colnames(X2) <- c("x1", "x2", "x5")
 colnames(X2) <- c("x2", "x1", "x3")
 checkNames(X1, X2)
 # returns the matrix X2, but with permuted columns
+
+l2 <- list(x3 = 1, x2 = c(2, 3), x1 = -6)
+checkNamesList(X1, l2)
+
 }
 
 \keyword{models}

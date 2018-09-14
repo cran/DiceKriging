@@ -34,7 +34,7 @@ Predicted values and (marginal of joint) conditional variances based on a \code{
   \item{lower95, }{ }
   \item{upper95 }{ bounds of the 95 \% confidence interval computed at \code{newdata} (to be interpreted with special care when parameters are estimated, see description above). Not computed if \code{se.compute=FALSE}.}
   \item{c }{ an auxiliary matrix, containing all the covariances between newdata and the initial design points. Not returned if \code{light.return=TRUE}.}
-  \item{Tinv.c }{ an auxiliary vector, equal to \code{T^(-1)*c}. Not returned if \code{light.return=TRUE}.}
+  \item{Tinv.c }{ an auxiliary vector, equal to \code{inv(t(T))*c}. Not returned if \code{light.return=TRUE}.}
 }
 
 \section{Warning}{

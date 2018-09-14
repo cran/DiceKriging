@@ -1,0 +1,60 @@
+language: r
+r:
+  - oldrel
+  - release
+  - devel
+branches:
+  only:
+    master
+
+warnings_are_errors: true
+r_packages:
+  - rgenoud
+  - foreach
+  - doParallel
+  - testthat
+  - numDeriv
+  - covr
+cache: packages
+
+os:
+  - linux
+  - osx
+addons:
+  apt:
+    packages:
+      - libssh2-1-dev
+      
+before_install:
+  - echo "$TRAVIS_OS_NAME"
+  - echo "$TRAVIS_R_VERSION_STRING"
+  - echo $PKG_TARBALL
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo chown -R $(whoami) /usr/local ; brew install libgit2; fi
+
+after_success:
+  - if [[ "$TRAVIS_R_VERSION_STRING" == "release" && ("$TRAVIS_OS_NAME" == "linux") ]]; then Rscript -e 'covr::codecov()'; fi
+
+before_deploy:
+  - if [[ "$TRAVIS_R_VERSION_STRING" == "release" && ("$TRAVIS_OS_NAME" == "osx") ]]; then R CMD INSTALL --build $PKG_TARBALL; fi
+  # next line will allow to deploy in an existing release (here osx-linux). Before you need to put env: global: secure: XXX by running 'travis encrypt GH_TOKEN=<my github password> --add' from inside cloned repository
+  - if [[ "$TRAVIS_R_VERSION_STRING" == "release" && ("$TRAVIS_OS_NAME" == "osx") ]]; then   git remote rm origin;  git remote add origin https://yannrichet:${GH_TOKEN}@github.com/DiceKrigingClub/DiceKriging.git;  git push --delete origin `git tag | grep -E 'osx-linux'`;   git tag -d `git tag | grep -E 'osx-linux'`;  git tag "osx-linux" --force; fi
+
+deploy:
+  provider: releases
+  name: "osx-linux"
+  api_key:
+    secure: f+1Pq8slKBREBY0pW3FrIDuZxtqSD9UTQv+7g6nX0R1v6i2ZC5w6UylalsNOUS5pqoQc8mcHvl56Kwxz3avBR17lzPNnAIWBrSphLw9I6jVcn1oeQcM4IlFeM6Cht0XjE9oi9rzs2xu/Tgx1oCcHPgnBgFwK0o/xMq7gbm5AstLlPr7takISzc/3X1pRDAF52o6TuaPaPvntFR+UcOpv5jpJMk3TONcGZvjfH8AgsIX4ZBE5Tvoeef+sl8XkHIHitJGBQvHn87ps23C4+m9FkjwjoRMJei5BrAJBHZ4Pg0vTeMeIs2e0T0NQ0gVNUsWOnHbcUPMBxLK33zM5LXCj8ncA3JxaiK17B/uaZ1HLS65q5KDqjRAgGHZ1pZ6Fu+FXMMXzk1GyanR3+oo1+ZB1SY7McZqvbVetohkBxEshFvQK9AAVRqfp0rPwv7DPhtgBQCCdPZRmITrb5cB9o0bAoCsARNSvaBU6eagEdx7vo0xgsFR9aPer0KNqZo9Zz1hDEsIxWFz1ExNELXdsAlwacTLYRtQXShMiWlqp9vWApfKkDwzstiypZCdjHYGqcRi9e2POx2ZCVC5R+3s/VTCTzzAlmLF0MhDFkLScM0MDf1O4s4rG3xYBqGeyxVncq4q9ADHr/7ud3FvaInMlBHYqoMMKCqcv2uKSqZHkLGorx7Q=
+  file_glob: true
+  file: DiceKriging*.t*gz
+  skip_cleanup: true
+  overwrite: true
+  on:
+    branch: master
+    except: 
+      - windows
+      - linux
+    condition: "$TRAVIS_R_VERSION_STRING = release"
+
+env:
+  global:
+    secure: e5QVfrHJXWElN1+/wrzVzbNLy8RX9E8LJWtA4K2uWx+D0YAD0HdxpJlsunBy5n9kGcSJJfWm+yVQG0bVNL7xMf9opx90wWBWPeEWHIpEJCChXcgoBCQLAdgCwndfjwrNnOZAVwhvKUEuNqC+lKzmdTO4bnHqIzp4bh38rzkXxb47rGPMZPz0WmR3g2YlIW0AS0WFRfa5iHg1GkAVeFi6YVeHTshEk38sXA37bIBoaCtG6uVUAzggwdMtDEEJFT5bdbpmtOOFaZCiVnkob/VnZZIPg4b6uqHYt2KSPL6613IyuP+J1RZp+DGYTbU+XnuBysoiCjGJous7FWDmivLeZk4HDob35NTbYh44WOihudrgPqVbthXpsrN69K7ZCAypQZz1WSLLw8CYfAhQ70IDkg1FtzWwlbVBRJC8xrI5RoqeXFk8OWJp7y2EB/CZQpu6DeoljWk08fBQDUVTkLibD5tkNN3H08R1zaLe/vwEB1dmYsDAZspaXr0d/LBmJUQdsTGWMLlnVccaKpxzO9jj5ZoShUyjLZBzEgLqtSkRYJJo2LEcdviz3WA9YGCdCuLjGwDNsnG6yrJAZ+v9BasrxOt3Ohdo7xkjfGpiSrY/wXQ+J/2uTBpxVX94bMtLFtuHpeNFQyAtNfkiz4N6qZUegAPN0KE6XnydW9nNHhZ2YcQ=

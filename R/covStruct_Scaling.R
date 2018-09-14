@@ -52,9 +52,10 @@ setClass("covScaling",
                if (any(diff(knots.i) <= 0.0)) {
                  return("dupplicated values in knots")
                }
-               if (length(knots.i) < 2L) {
-                 return("knots must be of length >=2")
-               }
+               # No longer needed because scalingFun now supports just one knot
+               #if (length(knots.i) < 2L) {
+               #  return("knots must be of length >=2")
+               #}
              }
              
              n.eta <- length(object@eta)
@@ -137,7 +138,12 @@ setMethod("vect2covparam",
               knots.n <- sapply(object@knots, length)
               ind <- rep(names(knots.n), times=knots.n)
               df <- data.frame(values=param, ind=ind)
-              object@eta <- unstack(df)
+              eta <- unstack(df)
+              if(length(eta)!=object@d) {
+                  t.eta=as.list(t(eta))
+                  names(t.eta) <- rownames(eta)
+                  object@eta = t.eta
+              } else object@eta = eta
             }
             return(object)
           }
@@ -250,8 +256,9 @@ setMethod("show",
               eta.names <- paste("eta", "(", object@var.names[i], ")", sep = "")
               param.names <- c(eta.names, knots.names)
               param.names <- formatC(param.names, width = 12)
-              tab <- t(formatC(cbind(object@eta[[i]], object@knots[[i]]), width = 10, digits = 4, format = "f", flag = " "))
-              n.i <- length(object@knots[[i]])
+              name.i <- object@var.names[i]
+              tab <- t(formatC(cbind(object@eta[[name.i]], object@knots[[name.i]]), width = 10, digits = 4, format = "f", flag = " "))
+              n.i <- length(object@knots[[name.i]])
               dimnames(tab) <- list(param.names, rep("", n.i))
               print(tab, quote=FALSE)
             }
