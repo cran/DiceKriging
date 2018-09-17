@@ -36,6 +36,10 @@ function(formula = ~1, design, response, covtype = "matern5_2",
   isCov <- length(coef.cov) != 0
   isVar <- length(coef.var) != 0
   
+  if ((scaling) & (length(knots) > 0)) {
+    knots <- checkNamesList(X1 = X, l2 = knots)
+  }
+  
   if ((isTrend && isCov && isVar) || (covtype == "covUser")) {
     known.param <- "All"
     nugget.estim <- FALSE
@@ -54,6 +58,9 @@ function(formula = ~1, design, response, covtype = "matern5_2",
   } else {
     known.covparam <- "None"
   }
+  
+  if (isTRUE(scaling) && is.null(knots)) # because we need to setup knots to X boundaries if not set (formerl called affineScaling)
+      knots <- as.list(data.frame(rbind(apply(FUN=min,2,X=design),apply(FUN=max,2,X=design)))) # by default will use min & max for each dimension
   
   model@covariance <- covStruct.create(covtype = covtype, d = model@d, 
                                        known.covparam = known.covparam, var.names = colnames(X), 
@@ -163,7 +170,7 @@ function(formula = ~1, design, response, covtype = "matern5_2",
   
   validObject(model, complete=TRUE)
   
-  varStationaryClass <- c("covTensorProduct", "covScaling", "covAffineScaling", "covIso")
+  varStationaryClass <- c("covTensorProduct", "covScaling", "covIso")
   
   if (length(noise.var)!=0) {   # noisy observations
     model@case <- "LLconcentration_beta"
@@ -215,7 +222,7 @@ function(formula = ~1, design, response, covtype = "matern5_2",
     for (i in 1L:nval) {
       u[i] <- cv(lambda.val[i], object = model, f)
     }
-    plot(lambda.val, u)
+    #plot(lambda.val, u)
     lambda <- lambda.val[which.min(u)]
     model@penalty$value <- lambda
     model <- f(model, envir = envir.logLik)

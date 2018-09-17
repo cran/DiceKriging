@@ -6,7 +6,7 @@ function(model, fn, fnscale) {
 	param.n <- model@covariance@param.n      
 	
 	if (length(parinit) > 0) {
-	  matrixinit <- matrix(parinit, nrow = param.n, ncol = 1)    
+	  matrixinit <- matrix(parinit, nrow = param.n, ncol = ninit)    
 	} else {
 	  lower <- model@lower
 	  upper <- model@upper
