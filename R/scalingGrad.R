@@ -1,27 +1,10 @@
-dfj_1pt_2param <- function(t, knots){ 
-    dfj <- vector(length=length(knots))
-    zeta0 <- knots[1]
-    zeta1 <- knots[2]
-    aux <- (t-zeta0)^2/(2*(zeta1-zeta0))
-    dfj[1] <- (t-zeta0) - aux 
-    dfj[2] <- aux 
-    return(dfj)
-}
-
-
-affineScalingGrad <- function(X, knots, k) {
-	df <- apply(X[, k, drop=FALSE], 1, dfj_1pt_2param, knots)
-	return(t(df))
-}
-
-
-
-scalingGrad1d <-
-function(x, knots, plot = FALSE) {
+scalingGrad1d <- function(x, knots, plot = FALSE) {
     
     n <- length(x)
     nKnots <- length(knots)
 		
+    if (nKnots == 1) return(matrix(0, nrow = n, ncol = nKnots))
+
     if ( any(x < knots[1]) | any(x > knots[nKnots]) )
       stop("'x' values must be inside the knots")
 	

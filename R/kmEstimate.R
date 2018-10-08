@@ -120,21 +120,25 @@ function(model, envir) {
       model@control$convergence <- o$convergence
     } else {
       # multistart with foreach
-      if (requireNamespace("foreach", quietly = TRUE)){
-        olist <- foreach::"%dopar%"(foreach::foreach(i=1:multistart, 
-                                  .errorhandling='remove'), {
-          model@covariance <- initList$cov[[i]]
-          optim(par = parinit[, i], fn = fn, gr = gr,
-                method = "L-BFGS-B", lower = lower, upper = upper,
-                control = controlChecked, hessian = FALSE, model, envir=envir)
-      })
+      if (!requireNamespace("foreach", quietly = TRUE)){
+        stop("Package \"foreach\" not found")
       }
+      olist <- foreach::"%dopar%"(foreach::foreach(i=1:multistart, 
+                                  .errorhandling='remove'), {
+        model@covariance <- initList$cov[[i]]
+        optim(par = parinit[, i], fn = fn, gr = gr,
+              method = "L-BFGS-B", lower = lower, upper = upper,
+              control = controlChecked, hessian = FALSE, model, envir=envir)
+        })
+      
       
       # get the best result
+      nOK <- length(olist)
+      if (nOK == 0) stop("All model optimizations returned an error") 
       bestValue <- Inf
       bestIndex <- NA
       vecValue <- c()
-      for (i in 1:multistart){
+      for (i in 1:nOK){
         currentValue <- fnscale * olist[[i]]$value
         vecValue <- c(vecValue, currentValue)
         if (currentValue < bestValue) {
@@ -169,8 +173,10 @@ function(model, envir) {
   
   model@control$multistart <- multistart
 
-  
-  if ((model@optim.method=="gen") & (requireNamespace("rgenoud", quietly = TRUE))) {       
+  if (model@optim.method=="gen") {
+    if (!requireNamespace("rgenoud", quietly = TRUE)) {
+      stop("Package \"rgenoud\" not found")
+    }
     genoudArgs <- formals(rgenoud::genoud)
     commonNames <- intersect(names(genoudArgs), names(control))
     genoudArgs[commonNames] <- control[commonNames]
