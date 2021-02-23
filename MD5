@@ -1,6 +1,6 @@
-fc515a80dd6eb55b94c619074c1bccb4 *CHANGELOG
-665015d35bc4c6d2c1f9ad12efd27e35 *DESCRIPTION
-c991fd5aa5e4d68227adf8de24b1179b *NAMESPACE
+fd5213bd6674ae18b2f437f80ee7d21b *CHANGELOG
+028ff5399d249cbd5f8e663511a9342d *DESCRIPTION
+859b6d4d30381485c4522c62268877ac *NAMESPACE
 1e766139f208466b094fabdbc100300d *R/SCAD.R
 a890d82e5994119676c75cae73fcbcd9 *R/SCAD.derivative.R
 19cf2e97269e962420fddf687fa7486a *R/allGenerics.R
@@ -17,6 +17,7 @@ b8067f013adf484b6faf240920511af1 *R/covStruct_Scaling.R
 32e1d4486cc9f39a950230095d12ba74 *R/covStruct_User.R
 7d828ff1454f477f57ed5eacd574fc71 *R/covStruct_XtraClass_Union.R
 25ddffefe50efa3ee5c83637a8bdee83 *R/covStruct_XtraMethods.R
+63837ae91aaf97e0009b5c2f22745f78 *R/cv.R
 d592fab1b499fe8ae8a6652b2bf6450e *R/diagABA.R
 95c77cfd5c604b7de0b190f8e4e382c3 *R/drop.reponse.R
 9ec88c23b7006f113f9c2fe2c0ad0d3e *R/goldsteinPrice.R
@@ -42,7 +43,7 @@ ba3e53fed9727f6e9cda49c6dacf57bc *R/logLikFun.R
 ba45f491362c1afdc6d546e4346a3cf2 *R/trendMatrix.update.R
 02fd31263fc2aa9f194f3fe74a593cae *README.md
 51f1e8ee33f310db239c034c7a83dc73 *inst/CITATION
-668725f67da01f1187daa05e2401c0a0 *man/DiceKriging-package.Rd
+8a4f1db97b91abc5afcb1ea6648fdc82 *man/DiceKriging-package.Rd
 8bad82f20ecfed476fef176c65df13e3 *man/SCAD.Rd
 22a4f2e03663d5f1cc699f1e73775d05 *man/SCAD.derivative.Rd
 3a6f50f113cc7cb2361b4ef9b6facefb *man/branin.Rd
@@ -62,6 +63,7 @@ b517acea4373c61ede498938fc2244ce *man/covTensorProduct-class.Rd
 2776efb58b682c3ecab6fecfb36f5d4b *man/covUser-class.Rd
 25f4196de463fe6e82da984eb74a3a30 *man/covVector.dx.Rd
 77038079e3d665c9866f44dc54d32996 *man/covparam2vect.Rd
+454eca8ff42047950b00528830ea71ca *man/cv.Rd
 a46f6c2effd123d7f6a0b2a6cdb60d8e *man/drop.response.Rd
 8547b509ceaff3563c45b088d1caa931 *man/goldsteinPrice.Rd
 04a7abccaf05606586b89ef5cf52eb0f *man/hartman3.Rd
@@ -75,7 +77,7 @@ f6b329ba8802db577d9ffa6e8dc0ce24 *man/kmData.Rd
 2deab2252c1a85512cb618b994e3bdcc *man/kmEstimate.Rd
 71292fc967cb736c44605cedf694e894 *man/kmNoNugget.init.Rd
 43db1a6f993c69a0a81bc044833dd737 *man/kmNuggets.init.Rd
-496b74597446f821e2582123c5221561 *man/leaveOneOut.km.Rd
+9332734e9d49923f7da70dc9810b17f7 *man/leaveOneOut.km.Rd
 df1dd18018bc25c6fe44a71affc82e06 *man/leaveOneOutFun.Rd
 908cf4e9d0968cbe81b83597c34c82f8 *man/leaveOneOutGrad.Rd
 c79834f9a040d767d39009c4ef14ece7 *man/logLik.km.Rd
@@ -108,3 +110,4 @@ a3eb846124d8bc6c4fccc9795fa29c5a *tests/testthat/test-checkNames.R
 8223d0369c47a85b20575bb596f65f6b *tests/testthat/test-scaling.R
 081c315d6b82dce17b26feab2c44e37c *tests/testthat/test-scalingdx.R
 b781bd47f090409b51a10d5a2e702168 *tests/testthat/test-trend.deltax.R
+c65f04a5a126fb2c59a23dc363d65610 *tests/testthat/tests-cv.R
